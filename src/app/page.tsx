@@ -22,13 +22,7 @@ export default function HomePage() {
   return (
     <main className="mx-auto max-w-(--container-shell) px-6 md:px-8">
       <section className="py-16 md:py-24">
-        <h1 className="max-w-2xl text-3xl font-semibold tracking-tight">
-          {site.description}
-        </h1>
-        <p className="mt-4 max-w-2xl text-fg-muted">
-          {site.author.name}입니다. 여기에는 개발하면서 부딪힌 문제와 그 해결 과정, 그리고
-          직접 만든 것들을 정리해 둡니다.
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">{site.name}</h1>
         <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
           <Link href="/about/" className="text-accent hover:underline">
             더 알아보기 →

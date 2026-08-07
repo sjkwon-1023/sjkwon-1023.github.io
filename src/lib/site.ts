@@ -4,8 +4,9 @@
  */
 export const site = {
   name: "sjkwon",
-  title: "sjkwon — 기술 블로그 & 포트폴리오",
-  description: "웹 개발하며 배운 것들을 기록하고, 만든 것들을 정리합니다.",
+  title: "sjkwon",
+  // 화면에는 쓰지 않고 meta description 과 RSS 채널 설명으로만 나간다.
+  description: "sjkwon 의 기술 블로그와 포트폴리오.",
   url: "https://sjkwon-1023.github.io",
   locale: "ko_KR",
   author: {

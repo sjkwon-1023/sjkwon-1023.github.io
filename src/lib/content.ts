@@ -113,11 +113,29 @@ function estimateReadingMinutes(body: string): number {
   return Math.max(1, Math.round(minutes));
 }
 
+/**
+ * `_` 로 시작하는 파일은 콘텐츠가 아니라 템플릿으로 보고 건너뛴다.
+ *
+ * 이 규칙이 필요한 이유: 본문은 `import(\`@content/posts/${slug}.mdx\`)` 로 불러오는데,
+ * 번들러는 이걸 디렉터리 전체에 대한 컨텍스트 모듈로 만든다. 디렉터리에 .mdx 가 하나도 없으면
+ * 그 모듈을 해석하지 못해 `Module not found` 로 빌드가 통째로 깨진다. 글이 0편인 상태는
+ * 새 블로그에서 정상이므로, 각 디렉터리에 `_template.mdx` 를 두어 모듈 그래프를 살려 둔다.
+ */
 function readMdxFiles(dir: string): { slug: string; raw: string }[] {
   if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".mdx"))
+
+  const entries = fs.readdirSync(dir);
+
+  // .md 로 쓰면 로더가 조용히 무시해 "글을 썼는데 안 보인다"가 된다. 크게 실패시킨다.
+  const strayMarkdown = entries.find((f) => f.endsWith(".md"));
+  if (strayMarkdown) {
+    throw new Error(
+      `${dir}/${strayMarkdown}: 확장자는 .mdx 여야 합니다. 내용은 그대로 두고 파일명만 .mdx 로 바꾸세요 (일반 마크다운 문법은 MDX 에서 그대로 동작합니다).`,
+    );
+  }
+
+  return entries
+    .filter((f) => f.endsWith(".mdx") && !f.startsWith("_") && !f.startsWith("."))
     .map((file) => {
       const slug = file.replace(/\.mdx$/, "");
       if (!SLUG_RE.test(slug)) {

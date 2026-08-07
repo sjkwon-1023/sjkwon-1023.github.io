@@ -34,6 +34,13 @@ npm run build && npx serve out
 
 ## Writing content
 
+Copy `content/posts/_template.mdx` (or `content/projects/_template.mdx`) and rename it.
+Files beginning with `_` are templates: the loader skips them, so they never become pages.
+
+The extension must be `.mdx`, not `.md` — plain Markdown syntax works unchanged inside MDX,
+so the content needs no edits, only the filename. A stray `.md` fails the build with a
+message saying so rather than being silently ignored.
+
 ### A post — `content/posts/<slug>.mdx`
 
 The filename is the URL: `content/posts/my-post.mdx` → `/blog/my-post/`.
@@ -100,7 +107,16 @@ actions, `cookies()`/`headers()`, and `next/image` optimization (hence
 `next.config.ts` are silently ignored — they warn at build and then do nothing, so a
 renamed post slug leaves a dead URL. `i18n` is a hard build error.
 
-Two rules follow from this and are easy to violate accidentally:
+**At least one published post must exist.** A dynamic route that generates zero pages is a
+hard build error under `output: "export"` (`E1454`, thrown unconditionally in
+`next/dist/build/static-paths/app.js` — there is no config flag). With no posts, both
+`/blog/[slug]` and `/tags/[tag]` fail. So a post can only be deleted once another is
+published. The same applies to `content/projects/`. Separately, each content directory must
+keep at least one `.mdx` file at all times — the `_template.mdx` files exist for this —
+because MDX bodies load through a bundler context module over the directory, and an empty
+one fails to resolve with `Module not found`.
+
+Three more rules follow from static export and are easy to violate accidentally:
 
 - Every `[param]` route needs `generateStaticParams()`, or the build fails. Each also sets
   `dynamicParams = false` so unknown slugs render 404 instead of attempting an impossible
