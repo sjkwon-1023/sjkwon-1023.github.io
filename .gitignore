@@ -20,6 +20,9 @@
 # production
 /build
 
+# personal source material (resume, portfolio notes) — never published
+/data/
+
 # misc
 .DS_Store
 *.pem
