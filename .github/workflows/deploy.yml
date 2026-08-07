@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포는 직렬화하되 진행 중인 배포를 취소하지는 않는다(중간에 끊긴 배포는 사이트를 깨뜨린다).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # next/font/google 는 빌드 타임에 폰트를 내려받는다. 캐시가 있으면 CI 빌드가
+      # 구글 서버 상태에 매번 의존하지 않는다.
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.[jt]s', 'src/**/*.[jt]sx', 'content/**/*.mdx', 'next.config.ts') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - run: npm ci
+
+      # 미리보기 환경이 없으므로 lint 가 깨진 배포를 막는 유일한 게이트다.
+      - run: npm run lint
+
+      # output: "export" 설정이라 `next build` 가 곧바로 ./out 을 만든다.
+      # (`next export` 명령은 오래전에 제거됐다.)
+      - run: npm run build
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

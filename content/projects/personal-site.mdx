@@ -1,0 +1,40 @@
+---
+title: "개인 기술 블로그 & 포트폴리오"
+description: "Next.js 정적 export + GitHub Actions 로 GitHub Pages 에 배포하는 개인 사이트."
+period: "2026.08 –"
+role: "설계 · 구현 · 운영"
+stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4", "MDX", "GitHub Actions"]
+repo: "https://github.com/sjkwon-1023/sjkwon-1023.github.io"
+demo: "https://sjkwon-1023.github.io"
+featured: true
+order: 1
+---
+
+지금 보고 있는 이 사이트다. 글과 프로젝트를 한 곳에서 관리하려고 만들었다.
+
+## 왜 Jekyll 이 아니라 Next.js 인가
+
+GitHub Pages 는 Jekyll 을 기본 지원하고, 기성 테마를 쓰면 반나절이면 블로그가 선다.
+그럼에도 Next.js 를 고른 이유는 포트폴리오 쪽 때문이다. 프로젝트 페이지는 결국 레이아웃을
+직접 잡게 되는데, 테마를 뜯어고치는 것보다 React 로 처음부터 짜는 편이 자유롭다.
+글은 MDX 로 쓰므로 마크다운 작성 경험은 그대로 남는다.
+
+정적 export 라 서버가 없다는 제약은 그대로 받는다. SSR, API routes, ISR, 이미지 최적화가
+전부 불가능하다. 블로그와 포트폴리오는 어차피 전부 정적 콘텐츠라 실질적인 손해는 없었다.
+
+## 구조
+
+- **콘텐츠는 git 이 CMS** — `content/posts/*.mdx`, `content/projects/*.mdx` 에 frontmatter 와
+  본문을 두고, 빌드 타임에 읽어 목록·상세 페이지를 만든다. 별도 관리 도구가 없다.
+- **코드 하이라이팅은 빌드 타임에** — Shiki 가 라이트/다크 두 벌의 색을 CSS 변수로 미리
+  박아 두고, 클라이언트로는 하이라이터를 한 바이트도 보내지 않는다.
+- **테마 전환은 CSS 가 담당** — `<head>` 의 인라인 스크립트가 첫 페인트 전에 `data-theme` 을
+  확정하고, 나머지는 전부 CSS 규칙으로 처리한다. 상태 관리 라이브러리가 없다.
+
+## 배포
+
+`main` 에 push 하면 GitHub Actions 가 `next build` 로 `out/` 을 만들어 Pages 에 올린다.
+Pages 의 배포 소스를 브랜치가 아니라 Actions 로 두었기 때문에 빌드 결과물을 레포에
+커밋할 필요가 없다.
+
+구축하면서 밟은 함정들은 [별도의 글](/blog/nextjs-github-pages/)로 정리해 두었다.
