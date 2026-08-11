@@ -52,6 +52,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <dt className="text-fg-muted">기간</dt>
           <dd className="font-mono">{project.period}</dd>
 
+          <dt className="text-fg-muted">분류</dt>
+          <dd className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <span key={tag} className="rounded-full border border-border px-2 py-0.5 text-xs">
+                {tag}
+              </span>
+            ))}
+          </dd>
+
           <dt className="text-fg-muted">역할</dt>
           <dd>{project.role}</dd>
 

@@ -1,0 +1,26 @@
+---
+title: "LangGraph 그래프 설계 도구"
+description: "노드와 엣지를 화면에서 배치하면 같은 구조의 LangGraph 코드를 생성하는 웹 도구입니다."
+period: "2025.05"
+sortDate: "2025-05-21"
+tags: ["개인 프로젝트"]
+role: "1인 · 기획·구현·배포 전담"
+stack: ["React", "LangGraph", "Netlify"]
+repo: "https://github.com/sjkwon-1023/langgraph_cad"
+demo: "https://langgraph-cad.netlify.app/"
+featured: false
+order: 1
+---
+
+특허 관련 외부 프로젝트를 진행하면서 LangGraph의 그래프 구조를 코드로 바로 설계하다 보니 노드와
+엣지의 연결을 한눈에 파악하기 어려웠습니다. 복잡해질 때만 잠깐 꺼내 쓸 수 있도록 이틀 동안 만든
+작은 설계 도구입니다.
+
+왼쪽 캔버스에서 노드와 엣지를 드래그해 배치하면 오른쪽에 같은 구조의 LangGraph 코드가 바로
+생깁니다. 일반 엣지와 조건부 엣지를 구분해 조건부 연결은 `add_conditional_edges` 형식으로
+출력합니다.
+
+n8n으로 구조를 그릴 수도 있었지만, 최종 결과물은 실제 서비스에 들어갈 LangGraph 코드여야
+했습니다. 워크플로 플랫폼을 설치하고 운영하는 대신, 화면에서 구조를 설계한 뒤 바로 코드로
+가져가는 데 초점을 맞췄습니다. 별도 서버나 저장 계층 없이 현재 설계 상태를 URL에 담았고, 필요할
+때 설치 없이 접속할 수 있도록 Netlify에 배포했습니다.

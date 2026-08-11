@@ -29,6 +29,9 @@ export type Project = {
   title: string;
   description: string;
   period: string;
+  /** 프로젝트 시작일. 목록의 최신순 정렬에만 사용하고 화면에는 period 를 표시한다. */
+  sortDate: string;
+  tags: string[];
   role: string;
   stack: string[];
   repo?: string;
@@ -36,6 +39,33 @@ export type Project = {
   featured: boolean;
   order: number;
 };
+
+function toProjectSortDate(value: unknown, source: string): string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new Error(
+      `${source}: sortDate 는 "YYYY-MM-DD" 형식이어야 합니다 (받은 값: ${JSON.stringify(value)})`,
+    );
+  }
+
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
+    throw new Error(`${source}: sortDate 가 달력에 존재하지 않습니다 (받은 값: ${value})`);
+  }
+
+  return value;
+}
+
+function requireProjectTags(value: unknown, source: string): string[] {
+  if (
+    !Array.isArray(value) ||
+    value.length === 0 ||
+    value.some((tag) => typeof tag !== "string" || tag.trim() === "")
+  ) {
+    throw new Error(`${source}: tags 는 비어 있지 않은 문자열 배열이어야 합니다`);
+  }
+
+  return value;
+}
 
 /**
  * frontmatter 의 date 를 YYYY-MM-DD 문자열로 확정한다.
@@ -248,6 +278,8 @@ export function getAllProjects(): Project[] {
         title: requireString(data.title, "title", source),
         description: requireString(data.description, "description", source),
         period: requireString(data.period, "period", source),
+        sortDate: toProjectSortDate(data.sortDate, source),
+        tags: requireProjectTags(data.tags, source),
         role: requireString(data.role, "role", source),
         stack: toStringArray(data.stack),
         repo: typeof data.repo === "string" ? data.repo : undefined,
@@ -256,7 +288,12 @@ export function getAllProjects(): Project[] {
         order: typeof data.order === "number" ? data.order : 999,
       } satisfies Project;
     })
-    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+    .sort(
+      (a, b) =>
+        b.sortDate.localeCompare(a.sortDate) ||
+        a.order - b.order ||
+        a.title.localeCompare(b.title),
+    );
 
   return projectCache;
 }

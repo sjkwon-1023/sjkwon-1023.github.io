@@ -20,7 +20,7 @@ export default function ProjectsPage() {
     <main className="mx-auto max-w-(--container-shell) px-6 py-12 md:px-8">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-        <p className="mt-2 text-fg-muted">직접 만들고 운영한 것들입니다.</p>
+        <p className="mt-2 text-fg-muted">업무와 개인 프로젝트를 최근 순으로 정리했습니다.</p>
       </header>
 
       {projects.length === 0 ? (
@@ -42,6 +42,17 @@ export default function ProjectsPage() {
               </div>
 
               <p className="mt-2 text-fg-muted">{project.description}</p>
+
+              <p className="mt-3 flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-border px-2 py-0.5 text-xs text-fg-muted"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </p>
 
               <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
                 <div className="flex gap-2">
