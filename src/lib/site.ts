@@ -16,21 +16,27 @@ export const site = {
   },
 } as const;
 
+/**
+ * 포트폴리오를 앞세우기 위해 블로그는 당분간 메뉴에서 뺀다. /blog/ 라우트와 content/posts/ 의
+ * 글, sitemap 항목은 그대로 두므로 다시 노출할 때는 이 배열에 항목만 되돌리면 된다.
+ * 피드는 아래 alternatesFor 주석 참고 — 자동탐색 링크만 따로 빼 뒀다.
+ */
 export const nav = [
-  { href: "/blog/", label: "Blog" },
   { href: "/projects/", label: "Projects" },
   { href: "/about/", label: "About" },
 ] as const;
 
 /**
  * 페이지가 alternates 를 선언하면 Next 는 루트의 alternates 를 병합하지 않고 통째로 갈아치운다.
- * 그래서 canonical 만 적으면 RSS 자동탐색 링크가 그 페이지에서 사라진다. 항상 이 헬퍼를 쓴다.
+ * canonical 을 페이지마다 직접 적는 대신 이 헬퍼를 거쳐 형태를 한곳에서 관리한다.
+ *
+ * 블로그를 감추는 동안 RSS 자동탐색 링크도 뺐다. 이게 있으면 메뉴에서 블로그를 지워도 브라우저와
+ * 피드 리더가 <link rel="alternate"> 로 피드를 찾아낸다. /rss.xml 라우트 자체는 살아 있으므로,
+ * 블로그를 다시 노출할 때 아래 types 한 줄만 되돌리면 된다.
+ *   types: { "application/rss+xml": `${site.url}/rss.xml` },
  */
 export function alternatesFor(path: string) {
-  return {
-    canonical: path,
-    types: { "application/rss+xml": `${site.url}/rss.xml` },
-  };
+  return { canonical: path };
 }
 
 /**

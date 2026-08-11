@@ -13,9 +13,6 @@ export function SiteFooter() {
         <a href={`mailto:${site.author.email}`} className="transition-colors hover:text-fg">
           Email
         </a>
-        <a href="/rss.xml" className="transition-colors hover:text-fg">
-          RSS
-        </a>
       </div>
     </footer>
   );

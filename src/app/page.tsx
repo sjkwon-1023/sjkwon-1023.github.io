@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { PostList } from "@/components/post-list";
-import { getAllPosts, getAllProjects } from "@/lib/content";
-import { metrics } from "@/lib/highlights";
+import { getAllProjects } from "@/lib/content";
 import { openGraphFor, site } from "@/lib/site";
 
-const HEADLINE = "전문가의 암묵지를 실제로 쓰이는 AI 제품으로 옮깁니다";
+const HEADLINE = "전문가의 검토 기준을 생성과 검증이 이어지는 시스템으로 만듭니다";
 
 export const metadata: Metadata = {
   description: HEADLINE,
@@ -18,7 +16,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const posts = getAllPosts().slice(0, 3);
   const featured = getAllProjects().filter((p) => p.featured);
 
   return (
@@ -27,10 +24,11 @@ export default function HomePage() {
         <p className="font-mono text-sm text-fg-muted">Applied AI · AX Product Engineer</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight">{HEADLINE}</h1>
         <p className="mt-5 max-w-2xl text-fg-muted">
-          건축설계 실무에서 AI 엔지니어로 전환했습니다. 현업의 모호한 업무를 관찰해 풀 문제를
-          정하고, 전문가의 판단 기준을 프롬프트와 비즈니스 로직으로 구조화해 생성부터 검증까지
-          이어지는 제품으로 만듭니다. 지금은 약 100명 규모 건축설계 조직의 첫 DX·AX 전담자이자
-          사내 유일 개발자로 일합니다.
+          건축설계 실무에서 AI 엔지니어로 전환했습니다. 현업에서 반복되는 업무를 관찰해 풀 문제를
+          정하고, 전문가가 검토할 때 쓰는 기준을 프롬프트와 비즈니스 로직, 검증 규칙으로 나눠
+          구조화합니다. 생성 결과만 내보내지 않고 실패와 재검토 경로까지 파이프라인에 포함합니다.
+          지금은 약 100명 규모 건축설계 조직의 첫 DX·AX 전담자이자 사내 유일 개발자로 일하고
+          있습니다.
         </p>
         <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
           <Link href="/about/" className="text-accent hover:underline">
@@ -43,21 +41,6 @@ export default function HomePage() {
             이메일 →
           </a>
         </div>
-      </section>
-
-      <section className="border-t border-border py-12">
-        <h2 className="sr-only">주요 성과</h2>
-        <dl className="grid gap-8 sm:grid-cols-3">
-          {metrics.map((m) => (
-            <div key={m.label}>
-              <dt className="text-2xl font-semibold tracking-tight">{m.value}</dt>
-              <dd className="mt-2 text-sm text-fg-muted">
-                {m.label}
-                <span className="mt-0.5 block font-mono text-xs">{m.context}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
       </section>
 
       {featured.length > 0 && (
@@ -89,18 +72,6 @@ export default function HomePage() {
           </ul>
         </section>
       )}
-
-      <section className="border-t border-border py-12">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">최근 글</h2>
-          <Link href="/blog/" className="text-sm text-fg-muted hover:text-accent">
-            전체 보기
-          </Link>
-        </div>
-        <div className="mt-6">
-          <PostList posts={posts} />
-        </div>
-      </section>
     </main>
   );
 }

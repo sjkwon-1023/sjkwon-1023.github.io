@@ -18,7 +18,7 @@ export function SiteHeader() {
 
         <nav className="flex items-center gap-5 text-sm">
           {nav.map((item) => {
-            // trailingSlash 설정 때문에 실제 경로는 "/blog/" 형태다. 하위 경로도 활성 처리한다.
+            // trailingSlash 설정 때문에 실제 경로는 "/projects/" 형태다. 하위 경로도 활성 처리한다.
             const active = pathname.startsWith(item.href);
             return (
               <Link
