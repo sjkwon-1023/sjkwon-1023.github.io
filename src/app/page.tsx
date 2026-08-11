@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getAllProjects } from "@/lib/content";
 import { openGraphFor, site } from "@/lib/site";
 
-const HEADLINE = "전문가의 검토 기준을 생성과 검증이 이어지는 시스템으로 만듭니다";
+const HEADLINE = "건축설계로 일을 시작해, 지금은 AI 제품을 만듭니다";
 
 export const metadata: Metadata = {
   description: HEADLINE,
@@ -24,11 +24,10 @@ export default function HomePage() {
         <p className="font-mono text-sm text-fg-muted">Applied AI · AX Product Engineer</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight">{HEADLINE}</h1>
         <p className="mt-5 max-w-2xl text-fg-muted">
-          건축설계 실무에서 AI 엔지니어로 전환했습니다. 현업에서 반복되는 업무를 관찰해 풀 문제를
-          정하고, 전문가가 검토할 때 쓰는 기준을 프롬프트와 비즈니스 로직, 검증 규칙으로 나눠
-          구조화합니다. 생성 결과만 내보내지 않고 실패와 재검토 경로까지 파이프라인에 포함합니다.
-          지금은 약 100명 규모 건축설계 조직의 첫 DX·AX 전담자이자 사내 유일 개발자로 일하고
-          있습니다.
+          현업에서 반복되는 업무를 관찰해 풀 문제를 정하고, 전문가가 검토할 때 쓰는 기준을
+          프롬프트와 비즈니스 로직, 검증 규칙으로 나눠 구조화합니다. 생성 결과만 내보내지 않고
+          실패와 재검토 경로까지 파이프라인에 포함합니다. 지금은 약 100명 규모 건축설계 조직의 첫
+          DX·AX 전담자이자 사내 유일 개발자로 일하고 있습니다.
         </p>
         <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
           <Link href="/about/" className="text-accent hover:underline">
@@ -46,7 +45,7 @@ export default function HomePage() {
       {featured.length > 0 && (
         <section className="border-t border-border py-12">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-xl font-semibold">선택한 작업</h2>
+            <h2 className="text-xl font-semibold">Selected Projects</h2>
             <Link href="/projects/" className="text-sm text-fg-muted hover:text-accent">
               전체 보기
             </Link>

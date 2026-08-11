@@ -74,6 +74,13 @@ body {
   font-size: var(--text-base);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+
+  /* 한국어는 기본값(word-break: normal)에서 음절 단위로 끊긴다. "구조화합니다" 가 줄 끝에서
+     "구조화합" / "니다" 로 갈라지는 것이 그래서다. keep-all 은 공백(어절) 경계에서만 줄을
+     바꾼다. 대신 어절 하나가 컨테이너보다 길면 밖으로 넘치므로, 그 경우에만 강제로 끊도록
+     overflow-wrap 을 함께 둔다 (긴 URL·식별자가 표나 좁은 카드에서 튀어나오는 것을 막는다). */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 h1,
