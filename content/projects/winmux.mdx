@@ -1,0 +1,83 @@
+---
+title: "winmux — Windows용 경량 터미널"
+description: "분할 패널·패널별 탭·워크스페이스와 에이전트 상태 표시를 한 화면에 묶은 Windows 11·WSL2 전용 터미널입니다."
+period: "2026.08 –"
+sortDate: "2026-08-08"
+tags: ["개인 프로젝트", "개발 도구"]
+role: "1인 · 기획·설계·구현·릴리스·운영"
+stack: ["Rust", "Tauri v2", "TypeScript", "xterm.js", "WebView2", "ConPTY", "WSL2", "GitHub Actions"]
+repo: "https://github.com/sjkwon-1023/winmux"
+featured: false
+order: 1
+---
+
+macOS에서는 cmux로 여러 코딩 에이전트를 나란히 띄워 작업했습니다. Windows 데스크톱으로 환경을
+옮기자 같은 흐름을 가볍게 유지할 도구가 마땅하지 않았습니다. 범용 터미널 에뮬레이터를 다시 만드는
+대신, 제가 실제로 쓰던 기능만 남긴 Windows용 터미널을 만들었습니다. 지금도 집의 Windows 11
+데스크톱에서 개발할 때 매일 사용하고 있습니다.
+
+## 한 화면에서 작업과 대기 상태를 함께 보기
+
+하나의 workspace 안에서 pane을 가로·세로로 나누고, 각 pane마다 여러 tab을 둘 수 있습니다.
+터미널 옆 sidebar에는 workspace별 에이전트가 실행 중인지, 입력을 기다리는지, 작업을 마쳤는지와
+마지막 메시지가 표시됩니다. 여러 에이전트를 동시에 돌릴 때 결과를 확인하려고 tab을 하나씩
+열어보지 않아도 되는 것이 핵심입니다.
+
+폴더 탐색기와 text·Markdown viewer도 tab으로 열립니다. 에이전트가 작업하는 동안 같은 창에서
+문서와 결과 파일을 읽기 위한 기능입니다. 큰 파일은 한 번에 전부 읽지 않고 512KiB 단위 window로
+가져와, viewer 하나 때문에 앱의 메모리 사용량이 크게 늘지 않도록 했습니다.
+
+## WSL2 전용이라는 경계를 먼저 정하기
+
+winmux에서 terminal을 연다는 것은 항상 `ConPTY → wsl.exe → login shell`을 실행한다는 뜻입니다.
+PowerShell과 CMD profile은 지원하지 않습니다. 기능이 빠진 상태가 아니라, 코딩 에이전트와 개발
+도구를 WSL2 안에서 사용하는 제 작업 환경에 제품 범위를 맞춘 결정입니다. 지원할 shell 조합을
+늘리는 대신 split, tab, workspace 전환과 에이전트 상태처럼 매일 쓰는 경로를 먼저 안정화했습니다.
+
+전역 단축키는 `Ctrl+Shift` 조합을 사용해 shell의 기본 `Ctrl` 입력을 최대한 그대로 보냅니다.
+선택 영역이 있을 때만 `Ctrl+C`를 복사로 처리하고, 선택이 없으면 SIGINT로 전달하는 식으로 terminal
+관례도 유지했습니다.
+
+## UI와 terminal 수명을 분리하기
+
+terminal session, flow control, OSC parsing, replay buffer와 layout 상태는 UI framework에 의존하지
+않는 순수 Rust core가 소유합니다. Tauri v2는 Windows host와 WebView2 사이의 얇은 연결 계층이고,
+vanilla TypeScript와 xterm.js가 화면을 렌더링합니다.
+
+이 경계 덕분에 메모리 회수를 위해 WebView를 reload해도 PTY session은 Rust에 남아 있고, 새 UI가
+현재 상태와 scrollback을 다시 받아 붙을 수 있습니다. 앱 자체를 종료했다가 다시 열 때는 저장한
+workspace·split·tab 구조와 마지막 작업 디렉터리를 복원하되, 이전 process가 살아 있는 것처럼
+가장하지 않고 shell을 새로 실행합니다.
+
+## 별도 daemon 없이 에이전트 상태 전달하기
+
+Claude Code hook은 terminal 출력에 OSC 777의 `winmux:running`·`winmux:needsInput`·`winmux:idle`
+token을 내보냅니다. Rust의 OSC scanner는 이를 일반 출력과 분리해 해당 tab과 workspace의 상태로
+반영합니다. OSC 9 같은 일반 알림은 unread와 message만 갱신해 다른 프로그램이 에이전트 상태를
+덮어쓰지 못하게 했습니다. 별도 daemon, IPC server나 named pipe를 추가하지 않고 이미 존재하는
+PTY stream을 상태 전달 경로로 사용했습니다.
+
+UI에는 실행 중·입력 대기·완료 상태만 남기고, terminal의 원문 output은 JSON으로 바꾸지 않습니다.
+출력의 hot path는 byte stream으로 유지하고 상태 변경처럼 빈도가 낮은 event만 UI 계층으로
+보냅니다.
+
+## 가볍게 유지하면서 직접 배포하기
+
+처음부터 메모리 목표를 100MB, 허용 상한을 150MB로 정했습니다. x64 Windows 11 데스크톱에서
+측정한 약 129MB는 목표보다 높지만 실제 사용을 시작하기로 한 범위 안에 있습니다. 현재 x64와
+ARM64 portable executable을 [GitHub Releases](https://github.com/sjkwon-1023/winmux/releases)에
+배포하고 있습니다.
+
+Rust core의 unit·integration test와 TypeScript UI test를 두고, CI에서 두 Windows target에 대한
+check·clippy와 frontend build·test를 실행합니다. release tag에서는 Windows runner가 x64·ARM64
+실행 파일을 만들어 GitHub Releases에 첨부합니다.
+
+## 지금 확인된 범위
+
+x64 Windows 11과 WSL2 조합은 집 데스크톱에서 실제 작업에 사용하며 검증하고 있습니다. ARM64는
+CI에서 build와 정적 검사를 통과하지만 실제 ARM64 장치에서는 아직 실행하지 못했습니다. Git branch
+표시와 내장 browser tab도 데이터 자리만 예약했을 뿐 구현된 기능처럼 노출하지 않았습니다.
+
+아직 초기 버전이고 사용자는 저 한 명입니다. 다만 제가 매일 겪는 문제에서 시작해, 구현한 기능을
+같은 환경에서 계속 사용하는 만큼 새로운 기능의 수보다 실제 작업 흐름을 깨뜨리는 문제를 먼저
+고치는 기준은 분명하게 유지하고 있습니다.
