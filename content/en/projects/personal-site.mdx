@@ -1,0 +1,38 @@
+---
+title: "Technical Blog and Portfolio"
+description: "A personal site that manages projects and articles in MDX and deploys statically to GitHub Pages."
+period: "Aug 2026 – Present"
+sortDate: "2026-08-01"
+tags: ["Personal Project"]
+role: "Design · Development · Operations"
+stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4", "MDX", "GitHub Actions"]
+repo: "https://github.com/sjkwon-1023/sjkwon-1023.github.io"
+demo: "https://sjkwon-1023.github.io"
+featured: false
+order: 1
+---
+
+I built this personal site so project write-ups and technical articles would not be scattered
+across different platforms. MDX files in `content/posts/*.mdx`, `content/projects/*.mdx`, and
+`content/en/projects/*.mdx` serve as the source of truth for each locale: every file keeps its
+content and frontmatter together, and Next.js generates the corresponding list and detail pages
+at build time. The key requirement was being able to revise content without also changing the UI
+code.
+
+## Designing for static deployment
+
+GitHub Pages does not run a Next.js server, but this site's content does not require SSR, ISR, or
+API routes. Rather than emulate server capabilities, the project uses `output: "export"` to
+generate static files only.
+
+The same principle guided syntax highlighting. Shiki completes its work at build time, so no
+highlighter ships to the browser. A small inline script chooses the light or dark theme before the
+first render; CSS and a client-side toggle handle subsequent changes. This preserves static
+deployment while reducing theme flashes on initial load.
+
+## Keeping source and deployment in one flow
+
+A push to the `main` branch triggers GitHub Actions to run lint and `next build`. Only the
+generated `out/` directory is deployed to GitHub Pages, and build artifacts are not committed to
+the repository. It is a simple deployment flow in which the live site and public source point to
+the same commit.

@@ -1,0 +1,46 @@
+---
+title: "Korean Dialogue Summarization"
+description: "Compared fine-tuned summarization models and LLMs to place 1st in a dialogue-summarization competition."
+period: "Nov 2024"
+sortDate: "2024-11-18"
+tags: ["Competition"]
+role: "3-person team · Data augmentation, summarization models, and LLM fine-tuning (Upstage AI Lab competition)"
+stack: ["Python", "OpenAI", "Fine-Tuning", "KoBART", "QLoRA"]
+featured: false
+order: 1
+---
+
+The competition used 12,457 training examples translated into Korean from DialogueSum and evaluated summaries
+for 249 hidden test examples with ROUGE. All three team members came from non-AI academic backgrounds, so we
+spent the first week learning core NLP concepts and the baseline code together. I was responsible for data
+augmentation, summarization models, and LLM fine-tuning. Because many reference summaries retained
+characteristics of translated prose, I focused the experiments on reproducing the evaluation set's style rather
+than simply generating the most natural Korean sentences.
+
+## How ROUGE shaped the experiments
+
+ROUGE is sensitive to wording shared with the reference summary. I therefore used GPT-4o-mini to expand the
+training data fivefold, while also testing input-length changes and special tokens for speakers and turns with
+KoBART- and KoGPT-family models. The goal was to separate the effects of data volume, input structure, and
+reference-summary style on the actual score.
+
+## Comparing summarization models and LLMs
+
+While fine-tuning KoBART- and KoGPT-family models, I compared augmentation volume, input token length, and special
+tokens that marked speakers and turns. Expanding the data fivefold with GPT-4o-mini produced only a small gain,
+and the special tokens had little effect. Adjusting input length helped slightly; `EbanLee/kobart-summary-v3`
+performed best in this track.
+
+In a separate LLM track, I fine-tuned GPT-4o-mini and tuned its few-shot examples and prompt. I also applied QLoRA
+to LLaMA 3.2 3B and EXAONE 7.8B to train them on the same summarization task.
+
+The best result came from fine-tuning GPT-4o-mini for two epochs on 500 examples. It achieved a ROUGE score of
+50.10, and the team finished in 1st place.
+
+## Comparisons left unfinished
+
+LLaMA 3.2 3B mixed multiple languages in its output, while EXAONE 7.8B still exceeded the available VRAM after
+quantization and could not complete training. Not finishing those two experiments before the competition ended
+was the main unresolved part of the project. Given the opportunity, I would complete QLoRA training for LLaMA
+and EXAONE using the same dataset, input length, and evaluation conditions, then compare their ROUGE scores and
+output quality with `EbanLee/kobart-summary-v3` and GPT-4o-mini.

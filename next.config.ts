@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   // 정적 호스트에는 next/image 최적화 서버가 없다. 끄지 않으면 export 단계에서 실패한다.
   images: { unoptimized: true },
 
+  // 언어별 root layout 을 쓰므로 공통 layout 밖에서 완전한 404 문서를 만들어야 한다.
+  experimental: { globalNotFound: true },
+
   pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 
   // user site(sjkwon-1023.github.io)는 루트에서 서빙되므로 basePath/assetPrefix 는 두지 않는다.

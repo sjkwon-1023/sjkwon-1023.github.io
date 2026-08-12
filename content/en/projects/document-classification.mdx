@@ -1,0 +1,38 @@
+---
+title: "Document Image Classification"
+description: "Classified 17 document types and used OCR only for low-confidence predictions, placing 5th in the competition."
+period: "Oct 29 – Nov 7, 2024"
+sortDate: "2024-10-29"
+tags: ["Competition"]
+role: "4-person team · EDA, model training, and OCR (Upstage AI Lab competition)"
+stack: ["Python", "ConvNeXt", "EfficientNet", "ViT", "Augraphy", "OCR"]
+featured: false
+order: 1
+---
+
+The task was to classify images of 17 document types, including bank-account documents, passports, medical
+certificates, and vehicle registration certificates. The training set contained 1,570 clean images, while the
+3,140 test images included blur, noise, and other transformations. Many categories—such as medical certificates,
+medical opinion letters, and medical-payment certificates—also had similar layouts. On the four-person team, I
+was responsible for EDA, model training, and OCR experiments.
+
+## Why I started with OCR—and why I pivoted
+
+In the previous competition, I regretted beginning by simply following the baseline's training approach. This
+time I wanted to explore a different direction from the outset. Because text within a document can identify its
+category more directly, I first tried OCR-based classification. The test images were noisier than expected,
+however, and reliable text extraction was not possible. I dropped the OCR-only approach and shifted the project
+to image classification.
+
+## Reproducing test-time transformations during training
+
+I applied the blur and noise observed in the test set to training images and used Mixup, CutMix, and Augraphy. At
+inference time, I applied test-time augmentation (TTA) using shifts, rotations, and flips. The team compared
+ResNet34/50, EfficientNet B3–B7 and V2-XL, ConvNeXt, and ViT-Base, selecting ConvNeXt as the final model because it
+performed best.
+
+## Using OCR only when confidence was low
+
+Even after the shift to image classification, errors remained among documents with similar layouts. I combined
+the two approaches by sending only predictions with low ConvNeXt softmax confidence through an OCR-based
+classification step. This conditional OCR strategy improved final accuracy, and the team finished 5th.

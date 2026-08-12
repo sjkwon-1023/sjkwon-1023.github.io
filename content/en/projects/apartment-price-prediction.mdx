@@ -1,0 +1,51 @@
+---
+title: "Apartment Sale Price Prediction"
+description: "Used architectural domain knowledge and external data to fill missing values, placing first in the competition."
+period: "Sep 2024"
+sortDate: "2024-09-02"
+tags: ["Competition"]
+role: "4-person team · EDA, feature engineering, and external data collection (Upstage AI Lab competition)"
+stack: ["Python", "XGBoost", "QGIS", "Iterative Imputer"]
+featured: false
+order: 1
+---
+
+This was a two-week competition to predict apartment sale prices over the following three months
+from historical transaction data. I initially thought the provided dataset was only for practice,
+so I spent the first week studying lectures and papers. Once I learned in the second week that it
+was the actual competition dataset, I focused the remaining time on recovering core features with
+extensive missing values. On a four-person team, I handled EDA, feature engineering, and external
+data collection; model selection and tuning were collaborative.
+
+## Using domain knowledge to guide EDA
+
+Gross floor area, building footprint, parking capacity, floor level, and XY coordinates all had
+substantial missingness, so we initially removed them. I brought them back because they contained
+information needed to explain price. Conversely, I excluded features with little relevance to
+sale price, such as road-name address and title-registration filing date. I also changed the
+definition of a newly built property from the existing 15-year cutoff to the 20-year threshold
+used for aged and substandard buildings. Rather than reducing features indiscriminately, I used
+architectural domain knowledge to decide which values to retain and which to discard.
+
+In QGIS, I extracted building footprint, gross floor area, site area, and parcel-centroid
+coordinates for each address and joined them to the original data. I shared the parcel-centroid
+coordinates so other competing teams could use them as well. For values that external data could
+not fill, I used linear interpolation or Iterative Imputer according to each column's
+characteristics.
+
+## Validating data against official records
+
+I recomputed floor area ratio and building coverage ratio from the dataset's gross floor area,
+building footprint, and site area, then compared them with the ratios in official records. I also
+checked the average number of floors. When the values in a row could not be reconciled, I
+classified the inconsistent values as outliers, removed them, and imputed them again. The priority
+was to clean data that could not be explained in the architectural domain before changing the
+model.
+
+## Score progression
+
+Root mean squared error (RMSE) fell from an initial 5894.0 to 5326.5751 after the first round of
+EDA, then to 4922.4728
+after filling missing values with external data. An XGBoost model with 1,000 trees and a maximum
+depth of 10 scored 3850.0347. A later experiment that also added the base interest rate and
+unit-size categories reduced it further to 3761.8572. We placed first overall.

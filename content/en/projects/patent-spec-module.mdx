@@ -1,0 +1,54 @@
+---
+title: "LangGraph Module for Automated Patent Specification Drafting"
+description: "Encoded a patent attorney's drafting criteria as LangGraph business logic and delivered a containerized module with explicit failure and retry paths."
+period: "Feb 2025 – Mar 2025"
+sortDate: "2025-02-18"
+tags: ["Professional Work", "Contract"]
+role: "Sole engineer responsible for the AI module (startup contract)"
+stack: ["Python", "LangChain", "LangGraph", "LLM", "Docker"]
+featured: true
+order: 1
+---
+
+The client was building a service that automatically drafted the description of an invention and
+its embodiments for patent specifications. The existing AI module did not produce text that could
+be delivered directly to users, so the lead patent attorney had to revise it manually. Under the
+firm's internal patent-attorney evaluation criteria, its quality was only about 20–30% of the
+target. As the sole contractor responsible for the AI module, I handled the LangGraph pipeline
+design, prompts, exception handling, and containerization.
+
+## Turning a patent attorney's judgment into executable rules
+
+Changing a single model or prompt could not reproduce the attorney's revision criteria
+consistently. I worked with the lead patent attorney to understand the drafting sequence,
+category-specific judgment criteria, and principles for correcting failure cases. I then
+formalized this tacit domain knowledge as generation rules and validation conditions, dividing the
+implementation between prompt engineering and LangGraph business logic.
+
+I separated the existing code into LangChain components so models and prompts could be swapped,
+and redesigned the generation, validation, and revision sequence as a LangGraph workflow. Input
+documents were parsed by section so that each step received only the context it needed. I also
+added a stage for processing patent drawings so that non-textual information would not be omitted
+from generation.
+
+## Failure handling was harder than generation
+
+A service that drafts legal documents cannot pass a truncated response or formatting error
+directly to a user. I therefore spent more effort specifying where and how the workflow should
+recover than simply handling successful responses.
+
+- Continue generation when a response is cut off by the token limit
+- Block prompt-injection inputs
+- Automatically review generated documents and regenerate them when errors are found
+
+Generation tasks ran in parallel. I packaged the completed module as a Docker container so the
+client could integrate it into the existing service environment. Production deployment and
+integration with the other service components were outside my scope.
+
+## Adopted into the service
+
+Quality under the firm's internal patent-attorney evaluation criteria increased from about 20–30%
+to 80–90%. Parallel processing reduced total processing time by about 20%. The containerized module
+I delivered was subsequently integrated into the live service. The pipeline covered not only
+successful generation but also explicit paths and retry conditions for interrupted output,
+invalid input, and failed review.

@@ -1,0 +1,57 @@
+---
+title: "RAG Document Retrieval"
+description: "Compared six embedding models and hybrid retrieval strategies, placing second in the competition."
+period: "Dec 2024"
+sortDate: "2024-12-16"
+tags: ["Competition"]
+role: "2-person team · Data augmentation and embedding retrieval (Upstage AI Lab competition)"
+stack: ["Python", "Embedding", "TF-IDF", "HNSW", "LLM"]
+featured: false
+order: 1
+---
+
+This was a four-day competition to retrieve the documents relevant to either a standalone
+question or a multi-turn conversation and submit the top three results. The metric was mean
+average precision (MAP). In our
+first meeting, we split the work into two approaches—LLM-based retrieval and embedding
+retrieval—then ran them in parallel and shared the findings. On the two-person team, I handled data
+augmentation and embedding retrieval.
+
+## Two retrieval paths from the first meeting
+
+The team's LLM-based path extracted keywords from each question, retrieved candidates with
+TF-IDF, and asked an LLM to choose the final three documents. It worked well for some questions,
+but its results varied substantially.
+
+For the embedding path, I compared six models.
+
+- KR-SBERT
+- KoSimCSE
+- klue/bert-base
+- BAAI/bge-large-en-v1.5
+- OpenAI text-embedding-3-small
+- Upstage embedding-query/passage
+
+Upstage embedding-query/passage performed best, with a MAP of 0.8848.
+
+## Narrowing the search from models to document representation
+
+After selecting the embedding model, I found that combining sparse and dense retrieval improved
+the score substantially over either method alone. Within hybrid retrieval, I compared the order
+of operations, score-combination weights, cosine and Euclidean distance, and HNSW index search.
+Changes to these details produced only small differences, so the next experiments changed the
+text being retrieved instead.
+
+Simple question augmentation lowered the score. Rewriting the questions with an LLM produced a
+small improvement, which led to the hypothesis that rewriting documents into a representation
+better suited to embedding retrieval might also help. Restructuring document content for
+retrieval produced the largest gain. In the final approach, I combined candidates from the
+original text, rewritten questions, and rewritten documents.
+
+## The result after four days
+
+The team was originally formed with four members, but two withdrew, leaving the two of us to
+run the actual competition. With only four days to test the LLM and embedding approaches in
+parallel, we did not train and apply a separate reranker. Starting from the embedding-model
+comparison, we iteratively changed retrieval order, similarity measures, and finally the
+representation of both questions and documents. We placed second overall.

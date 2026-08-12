@@ -1,0 +1,75 @@
+---
+title: "CSAT English Question Generation and Validation System"
+description: "Systematized type-specific generation and validation criteria, raising the initial internal review pass rate from under 10% to about 70%."
+period: "Jun 2025 – May 2026 (during my tenure)"
+sortDate: "2025-06-01"
+tags: ["Professional Work", "Production"]
+role: "BookIPs · AI Engineer — Designed type-specific generation and validation logic and led iterative experiments"
+stack: ["Python", "FastAPI", "PostgreSQL", "Prefect", "dbt", "GCP", "LLM API", "ML Serving"]
+featured: true
+order: 1
+---
+
+A good English question for South Korea's College Scholastic Ability Test (CSAT) did not emerge
+from a single prompt. Review comments such as “the distractors are too easy” or “this feels
+AI-generated” contained criteria that experts applied implicitly, and developers often interpreted
+the same comment differently. The initial internal review pass rate for question types including
+grammar and vocabulary was under 10%.
+
+## From batch generation to a real-time service
+
+This was not an experimental notebook, but a production pipeline for generating, validating, and
+loading questions. Depending on the question type, the system generated
+batches of 20,000–90,000 questions. The same generation modules also served real-time user
+requests. Cumulative LLM spending for batch generation was in the tens of millions of Korean won.
+
+The team jointly built the Python and FastAPI microservices, Prefect batches, and dbt and
+PostgreSQL data flow. The backend used a layered architecture, with type-specific specifications
+supplied through dependency injection. I did not design the entire architecture alone: I
+contributed to several modules from the initial development phase, then focused primarily on
+type-specific LLM generation and validation logic and the iterative experiments around them.
+
+Some question types used ML models that had been trained before I joined. I helped serve those
+models and connect their outputs to the LLM pipeline.
+
+## Type-specific rules instead of one prompt
+
+More than ten question types—including topic, main idea, cloze, grammar, vocabulary, and paragraph
+ordering—followed different authoring processes and failed in different ways. I retraced each
+process with content specialists and organized their feedback into four categories.
+
+- Requirements that must always be satisfied
+- Expressions and structures that must not be used
+- Review acceptance criteria
+- Post-processing rules that can be implemented in code
+
+Instead of delegating every judgment to an LLM, I maintained separate prompts and few-shot
+examples for each type and moved deterministically checkable conditions into post-processing
+logic. Questions generated through the Gemini and OpenAI APIs were checked automatically before
+expert review, and those review results fed back into the rules and examples for the next
+experiment.
+
+## A repeatable review loop
+
+Improving individual prompts was not enough to repeat experiments under consistent conditions. I
+connected generation, validation, and loading in Prefect pipelines so batch execution and
+comparison followed the same process each time. Human review was not a final step outside the
+automation; it was an input that updated the criteria for subsequent generation.
+
+## Quality observed in production
+
+The initial internal review pass rate increased from under 10% to about 70%. Questions ultimately
+delivered through the system received no quality complaints over six months, and a content
+specialist described some outputs as “better than those written by an average professional item
+writer.” These results did not come from one model alone. They came from connecting type-specific
+criteria, automated checks, and expert review through a shared vocabulary.
+
+## Improvements that grew out of this system
+
+- [Improving Answer-Choice Combination for Korean CSAT English
+  Questions](/en/projects/question-combination/): restored the valid
+  question pool from about 40,000 to about 90,000 without generating additional answer choices with an
+  LLM after a combination bug reduced the pool.
+- [Optimizing LLM Item-Validation Costs](/en/projects/llm-cost-optimization/): used a PoC to
+  test whether evaluation consistency could be improved while reducing token costs and processing
+  time.
