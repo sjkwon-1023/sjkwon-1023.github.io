@@ -1,8 +1,8 @@
 ---
 title: "winmux — A Lightweight Terminal for Windows"
 description: "A Windows 11 and WSL2 terminal that brings split panes, per-pane tabs, workspaces, and coding-agent status into one interface."
-period: "Aug 2026 – Present"
-sortDate: "2026-08-08"
+period: "Aug 2026"
+sortDate: "2026-08-11"
 tags: ["Personal Project", "Developer Tool"]
 role: "Solo · Product planning, architecture, implementation, release, and maintenance"
 stack: ["Rust", "Tauri v2", "TypeScript", "xterm.js", "WebView2", "ConPTY", "WSL2", "GitHub Actions"]
@@ -13,7 +13,7 @@ order: 1
 
 On macOS, I worked with several coding agents side by side in cmux. After moving to a Windows
 desktop, I could not find a lightweight tool that preserved the same workflow. Rather than
-recreate a general-purpose terminal emulator, I built a Windows terminal around only the features
+build a general-purpose terminal emulator, I built a Windows terminal around only the features
 I actually used. I still use it every day when developing on my Windows 11 desktop at home.
 
 ## Seeing active and waiting states on one screen
@@ -69,8 +69,8 @@ such as state changes are sent to the UI layer.
 ## Keeping it lightweight while distributing it directly
 
 I set an initial memory target of 100 MB and an upper bound of 150 MB. The roughly 129 MB measured
-on an x64 Windows 11 desktop exceeds the target but falls within the range where I decided to
-begin using the application. Portable executables for x64 and ARM64 are currently available
+on an x64 Windows 11 desktop exceeds the target but remains below the upper bound; I accepted that
+trade-off for the first release. Portable executables for x64 and ARM64 are currently available
 through [GitHub Releases](https://github.com/sjkwon-1023/winmux/releases).
 
 The project includes unit and integration tests for the Rust core and UI tests for TypeScript. CI
@@ -80,10 +80,9 @@ tags, Windows runners build the x64 and ARM64 executables and attach them to Git
 ## Scope verified so far
 
 I use and validate the x64 Windows 11 and WSL2 combination in daily work on my home desktop. The
-ARM64 target builds successfully and passes static checks in CI, but I have not yet run it on a physical ARM64
-device. The data model reserves fields for a Git branch indicator and built-in browser tabs, but
-neither is exposed as an implemented feature.
+ARM64 target's verified scope is currently limited to successful builds and static checks in CI.
+The data model reserves fields for a Git branch indicator and built-in browser tabs, but neither
+is exposed as an implemented feature.
 
-This is still an early version with one user: me. Because it began with a problem I encounter
-every day and I continue using the implementation in that same environment, the priority remains
-clear—fix issues that disrupt the real workflow before increasing the feature count.
+This is still an early version, but I use it daily in my own workflow. Its priority remains clear:
+fix issues that disrupt that workflow before increasing the feature count.

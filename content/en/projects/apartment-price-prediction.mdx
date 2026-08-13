@@ -11,11 +11,10 @@ order: 1
 ---
 
 This was a two-week competition to predict apartment sale prices over the following three months
-from historical transaction data. I initially thought the provided dataset was only for practice,
-so I spent the first week studying lectures and papers. Once I learned in the second week that it
-was the actual competition dataset, I focused the remaining time on recovering core features with
-extensive missing values. On a four-person team, I handled EDA, feature engineering, and external
-data collection; model selection and tuning were collaborative.
+from historical transaction data. I focused on recovering price-relevant features with extensive
+missing values by combining architectural domain knowledge with external data. On a four-person
+team, I handled EDA, feature engineering, and external data collection; model selection and tuning
+were collaborative.
 
 ## Using domain knowledge to guide EDA
 
@@ -28,9 +27,8 @@ used for aged and substandard buildings. Rather than reducing features indiscrim
 architectural domain knowledge to decide which values to retain and which to discard.
 
 In QGIS, I extracted building footprint, gross floor area, site area, and parcel-centroid
-coordinates for each address and joined them to the original data. I shared the parcel-centroid
-coordinates so other competing teams could use them as well. For values that external data could
-not fill, I used linear interpolation or Iterative Imputer according to each column's
+coordinates for each address and joined them to the original data. For values that external data
+could not fill, I used linear interpolation or Iterative Imputer according to each column's
 characteristics.
 
 ## Validating data against official records
@@ -44,8 +42,7 @@ model.
 
 ## Score progression
 
-Root mean squared error (RMSE) fell from an initial 5894.0 to 5326.5751 after the first round of
-EDA, then to 4922.4728
-after filling missing values with external data. An XGBoost model with 1,000 trees and a maximum
-depth of 10 scored 3850.0347. A later experiment that also added the base interest rate and
-unit-size categories reduced it further to 3761.8572. We placed first overall.
+Root mean squared error (RMSE) fell from an initial 5894.0 to 5326.6 after the first round of EDA,
+then to 4922.5 after filling missing values with external data. An XGBoost model with 1,000 trees
+and a maximum depth of 10 scored 3850.0. A later experiment that also added the base interest rate
+and unit-size categories reduced it further to 3761.9. We placed first overall.

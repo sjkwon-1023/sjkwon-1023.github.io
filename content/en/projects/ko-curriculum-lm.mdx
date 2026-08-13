@@ -176,9 +176,9 @@ experiment, the deficit for `difficulty` was concentrated not in the hard band (
 
 This result suggests that sorting by difficulty alone is not enough when designing a pretraining curriculum.
 Rehearsal that periodically reintroduces easy data, or interleaving across difficulty bands, must be treated as
-part of the schedule. The fact that `mixed` performed less poorly than the fully sorted conditions is consistent
-with its preview of the next band making the distribution shift more gradual while also increasing the share of
-easy data. Because `mixed` changes both factors, however, this experiment cannot separate the contribution of
+part of the schedule. The fact that `mixed` lost less ground than the fully sorted conditions is consistent with
+its preview of the next band making the distribution shift more gradual while also increasing the share of easy
+data. Because `mixed` changes both factors, however, this experiment cannot separate the contribution of
 previewing from that of data selection.
 
 ### Data fit partly offset model size on some tasks
@@ -212,7 +212,7 @@ language-model pretraining.
 The anchor comparison suggests a hypothesis: a small specialized model can outperform a larger general model on
 **distribution-fit** tasks, but cannot replace the minimum model capacity required for **reasoning tasks**. For a
 small code-specific model, this predicts efficiency on syntax and autocomplete but
-a need for roughly 1B parameters or more for algorithmic problem solving. The same structure could be tested in
+a minimum capacity of about 1B parameters for algorithmic problem solving. The same structure could be tested in
 vision by pairing a small captioner with a text LLM and asking whether the caption's information bottleneck sets
 an upper bound on final performance.
 

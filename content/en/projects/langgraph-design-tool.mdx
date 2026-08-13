@@ -14,7 +14,7 @@ order: 1
 
 While working on an external patent project, I found it difficult to understand node and edge connections at a
 glance when designing LangGraph structures directly in code. I built this small design tool in two days so I
-could bring it up whenever a graph became complex.
+could pull it up whenever a graph became complex.
 
 Drag nodes and edges onto the canvas on the left, and matching LangGraph code appears immediately on the right.
 The tool distinguishes regular from conditional edges and emits conditional connections with
@@ -23,4 +23,4 @@ The tool distinguishes regular from conditional edges and emits conditional conn
 I could have diagrammed the structure in n8n, but the required output was LangGraph code for the production service.
 Instead of installing and operating a workflow platform, I focused on moving directly from visual design to
 code. The current design state is encoded in the URL, with no server or persistence layer, and the tool is
-deployed on Netlify so it can be used without installation whenever needed.
+deployed on Netlify so it can be used without installation as needed.

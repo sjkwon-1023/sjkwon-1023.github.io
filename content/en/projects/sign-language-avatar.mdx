@@ -39,6 +39,11 @@ it. I selected and fine-tuned `hyunwoongko/kobart`, whose output was stable unde
 configuration. During these experiments, extending the input and output lengths to accommodate a
 small number of long samples worsened validation loss, so I kept the maximum length at 128.
 
+In a ten-epoch run, validation loss began rising again after roughly the fifth epoch. I therefore
+fixed later experiments at five epochs and saved the checkpoint with the lowest validation loss.
+
+![Training and validation loss curves for hyunwoongko/kobart](/media/sign-language/training-loss.png)
+
 Another issue was that sign-language morphemes combining Korean characters and numbers, such as
 `먼지1#`, did not map one-to-one to existing tokenizer tokens. Instead of adding a
 morpheme-specific vocabulary and retraining the tokenizer, I constrained decoding so the model
@@ -48,15 +53,55 @@ preserving the meaning carried by Korean subword units the tokenizer already kne
 ## Finding why the coordinates broke
 
 For each translated morpheme, we looked up the corresponding facial, pose, and both-hand
-coordinates in the source JSON and converted them into frame sequences. A teammate applied those
-coordinates to a rigged model in Unity, but the character did not move correctly. After completing
-the translation-model work, I joined the investigation.
+coordinates in the source JSON and converted them into frame sequences. The image below shows the
+source sign-language video with facial, pose, and both-hand keypoint annotations.
 
-Using Blender Python, I visualized each frame's coordinates as points and compared them with the
-rig structure. This revealed that the Armature assumed by the coordinate data had a different
-number of bones from the downloaded rig, breaking the mapping. I documented the reproduction
-steps and cause in a bug report. Using that report, the teammate responsible for Unity corrected
-the mapping and completed the final character animation.
+![Facial, pose, and hand keypoint annotations on a source sign-language video](/media/sign-language/source-keypoints.png)
+
+A teammate applied those coordinates to a rigged model in Unity, but the character did not move
+correctly. This is the failed animation produced when the rig and coordinate data did not match.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Unity avatar moving incorrectly because the rig did not match the coordinate data"
+>
+  <source src="/media/sign-language/rig-mismatch.mp4" type="video/mp4" />
+</video>
+
+After completing the translation-model work, I joined the investigation. I first used Blender
+Python to visualize the frame-by-frame coordinates for the translated sign morphemes as points,
+checking whether the morpheme-to-coordinate stage worked correctly.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Checking translated sign-morpheme coordinates as points in Blender"
+>
+  <source src="/media/sign-language/blender-points.mp4" type="video/mp4" />
+</video>
+
+I then removed the avatar mesh and reproduced only the point-to-rig-bone mapping.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Checking the mapping between points and rig bones in Blender"
+>
+  <source src="/media/sign-language/blender-rig.mp4" type="video/mp4" />
+</video>
+
+By isolating and comparing those stages, I found that the Armature assumed by the coordinate data
+had a different number of bones from the downloaded rig, breaking the mapping. I documented the
+reproduction steps and root cause in a bug report. The teammate responsible for Unity then used
+that diagnosis to switch to another rigged model compatible with the coordinate structure and
+complete the final character animation.
 
 ## What we implemented—and what remains unvalidated
 
@@ -69,7 +114,8 @@ preserved alongside an English gloss.
 > from outdoor activities.”
 > Model output: `먼지1# 주의보1 밖1 하지마1 내일1 오후1`
 
-Below is the final avatar animation completed by my teammate in Unity.
+Below is the final avatar animation completed by my teammate in Unity after switching to a
+compatible rigged model.
 
 <video
   controls
