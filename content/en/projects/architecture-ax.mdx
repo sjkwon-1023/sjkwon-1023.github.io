@@ -1,0 +1,60 @@
+---
+title: "Digital & AI Transformation for Architecture Firm"
+description: "Building collaboration and cloud infrastructure, along with automation tools for architectural workflows, at an architecture firm of roughly 100 people."
+period: "Jun 2026 – Present"
+sortDate: "2026-06-01"
+tags: ["Professional Work", "In Progress"]
+role: "AA Architects & Planners · Head of AI Lab — first dedicated digital and AI transformation lead and in-house developer"
+stack: ["Python", "FastAPI", "PostgreSQL", "Docker", "Terraform", "GCP", "MCP", "LLM API"]
+featured: true
+order: 1
+---
+
+As an architectural designer, I was responsible for completing drawings and models on deadline. After returning
+to the same organization as its first dedicated digital and AI transformation lead, I began looking at that
+process from a different angle: which steps are repetitive, and where human judgment must remain.
+
+## Choosing the first problem to solve
+
+As the only in-house developer in an organization of roughly 100 people, I handle workflow analysis, development
+priorities, service implementation, cloud infrastructure, and adoption by design teams. My 20 months of hands-on
+experience designing apartment complexes and urban-renewal projects helped me identify where designers spend
+their time and where professional review is indispensable.
+
+The analysis showed that proposal-stage schematic design consumed the most staff time. Site assessment, site planning,
+modeling, aerial renderings, and presentation materials followed one another, and a single cycle typically
+took two to three weeks. Rather than optimizing one isolated feature first, I prioritized connecting this workflow
+one stage at a time.
+
+## Why I did not automate everything at once
+
+Many stages of schematic design depend more on review than on generation. Instead of handing over the entire
+process at once, I divided it into replaceable modules: AI produces a draft or first-pass evaluation, and a
+designer makes the final decision.
+
+For aerial rendering, I consolidated the prompting practices that had varied from employee to employee into
+criteria built into the tool. Image generation and initial evaluation by large language and vision-language models
+(LLMs/VLMs) are automated, but users review the results and choose the final image. The system records their
+selections, regeneration requests, and ratings for
+weekly feedback, retaining not only the deliverables but also the data needed for the next round of improvements.
+
+For the modeling stage, I developed a beta tool that connects map-based building-registry lookup with DXF and
+SketchUp Model Context Protocol (MCP) integrations. The next step is to connect site planning and
+presentation-material generation.
+
+## The foundation that had to come before AI
+
+If work conversations and documents do not accumulate as company assets, it becomes difficult to connect future
+workflow systems or knowledge retrieval. I led the adoption of Microsoft 365, Teams, and Outlook, compared
+products and contract terms, and secured terms that reduced costs by approximately 15%. I structured the
+environment so that materials remain under company accounts and designed a data model that future work-log and
+project-management systems can share.
+
+The internal services use FastAPI and Next.js. I manage GCP Cloud Run, Cloud SQL, GCS, and Secret Manager with
+Terraform, and built keyless CI/CD with GitHub Actions and Workload Identity Federation (WIF)/OIDC.
+
+## Current status
+
+The rendering assistant and modeling-automation tool are still under development and rollout. This is not yet an
+end-to-end automation system for schematic design; I am connecting modules as real user choices and feedback
+accumulate.

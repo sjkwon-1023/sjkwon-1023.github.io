@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { EN_ROUTES } from "@/lib/site";
+import { hasEnglishVersion } from "@/lib/site";
 
 /**
  * 한국어 ↔ 영어 전환. trailingSlash: true 라 pathname 은 "/projects/" 처럼 슬래시가 붙어
@@ -18,7 +18,7 @@ export function LocaleToggle() {
 
   const href = isEn
     ? pathname.replace(/^\/en/, "") || "/"
-    : (EN_ROUTES as readonly string[]).includes(pathname)
+    : hasEnglishVersion(pathname)
       ? `/en${pathname}`
       : "/en/";
 
@@ -26,7 +26,7 @@ export function LocaleToggle() {
     <Link
       href={href}
       hrefLang={isEn ? "ko" : "en"}
-      aria-label={isEn ? "한국어로 전환" : "Switch to English"}
+      aria-label={isEn ? "Switch to Korean" : "Switch to English"}
       className="grid size-9 place-items-center rounded-md font-mono text-xs text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg"
     >
       {isEn ? "KO" : "EN"}

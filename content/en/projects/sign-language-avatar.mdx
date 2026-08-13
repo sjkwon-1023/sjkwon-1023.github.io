@@ -1,0 +1,134 @@
+---
+title: "Korean Text-to-Korean Sign Language 3D Avatar"
+description: "Built a model that translates Korean sentences into Korean Sign Language morphemes and diagnosed failures in the 3D avatar integration."
+period: "Mar 2025 – Apr 2025"
+sortDate: "2025-03-19"
+tags: ["Personal Project"]
+role: "3-person team · EDA, translation-model fine-tuning, and Blender-based error diagnosis"
+stack: ["Python", "koBART", "PyTorch", "WandB", "Blender", "Unity"]
+featured: false
+order: 1
+---
+
+The team began with the idea of having a 3D avatar express spoken or written Korean in Korean Sign
+Language (KSL). The task was not initially defined as a translation problem. After analyzing AI
+Hub data and the structures of Korean and sign-language morphemes, I defined the
+Korean-to-sign-morpheme stage as a translation task and proposed starting with the BART family.
+
+Our available environment was a Windows PC with 8 GB of VRAM. On the three-person team, I handled
+EDA and translation-model fine-tuning. Later, I used Blender to diagnose the cause of errors in
+the Unity animation.
+
+## Defining the problem as translation and choosing BART
+
+The target output was not a free-form Korean sentence but a short sequence of sign-language
+morphemes. Given the 8 GB VRAM constraint and roughly 130,000 training examples, we chose the
+encoder-decoder architecture of koBART base over a larger generative model. Rather than begin with
+a model already fine-tuned for summarization or translation, I judged it better to teach the base
+model the sign-language output format directly from our data.
+
+Most of the original data consisted of sentences describing disaster scenarios. We used the
+sign-language morphemes to prompt an LLM to generate everyday Korean sentences, expanding the
+training set to roughly 130,000 examples, although the generated sentences were repetitive. We
+also considered using a separate Korean everyday-conversation dataset as input, but excluded it
+because of storage constraints.
+
+I tested `gogamza/kobart-base-v2` and `hyunwoongko/kobart`. Because
+`gogamza/kobart-base-v2` continued to repeat the same output across parameter changes, I excluded
+it. I selected and fine-tuned `hyunwoongko/kobart`, whose output was stable under the default
+configuration. During these experiments, extending the input and output lengths to accommodate a
+small number of long samples worsened validation loss, so I kept the maximum length at 128.
+
+In a ten-epoch run, validation loss began rising again after roughly the fifth epoch. I therefore
+fixed later experiments at five epochs and saved the checkpoint with the lowest validation loss.
+
+![Training and validation loss curves for hyunwoongko/kobart](/media/sign-language/training-loss.png)
+
+Another issue was that sign-language morphemes combining Korean characters and numbers, such as
+`먼지1#`, did not map one-to-one to existing tokenizer tokens. Instead of adding a
+morpheme-specific vocabulary and retraining the tokenizer, I constrained decoding so the model
+could generate only token sequences corresponding to morphemes found in the dataset while
+preserving the meaning carried by Korean subword units the tokenizer already knew.
+
+## Finding why the coordinates broke
+
+For each translated morpheme, we looked up the corresponding facial, pose, and both-hand
+coordinates in the source JSON and converted them into frame sequences. The image below shows the
+source sign-language video with facial, pose, and both-hand keypoint annotations.
+
+![Facial, pose, and hand keypoint annotations on a source sign-language video](/media/sign-language/source-keypoints.png)
+
+A teammate applied those coordinates to a rigged model in Unity, but the character did not move
+correctly. This is the failed animation produced when the rig and coordinate data did not match.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Unity avatar moving incorrectly because the rig did not match the coordinate data"
+>
+  <source src="/media/sign-language/rig-mismatch.mp4" type="video/mp4" />
+</video>
+
+After completing the translation-model work, I joined the investigation. I first used Blender
+Python to visualize the frame-by-frame coordinates for the translated sign morphemes as points,
+checking whether the morpheme-to-coordinate stage worked correctly.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Checking translated sign-morpheme coordinates as points in Blender"
+>
+  <source src="/media/sign-language/blender-points.mp4" type="video/mp4" />
+</video>
+
+I then removed the avatar mesh and reproduced only the point-to-rig-bone mapping.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl border border-border"
+  aria-label="Checking the mapping between points and rig bones in Blender"
+>
+  <source src="/media/sign-language/blender-rig.mp4" type="video/mp4" />
+</video>
+
+By isolating and comparing those stages, I found that the Armature assumed by the coordinate data
+had a different number of bones from the downloaded rig, breaking the mapping. I documented the
+reproduction steps and root cause in a bug report. The teammate responsible for Unity then used
+that diagnosis to switch to another rigged model compatible with the coordinate structure and
+complete the final character animation.
+
+## What we implemented—and what remains unvalidated
+
+After changing the model and constraining its output, the system produced examples like the
+following. Because the model operates on Korean, the original input and morpheme output are
+preserved alongside an English gloss.
+
+> Korean input: `내일 오후 미세먼지 주의보가 발령되었으니 외부활동을 삼가해 주시기 바랍니다`
+> English gloss: “A fine-dust advisory has been issued for tomorrow afternoon, so please refrain
+> from outdoor activities.”
+> Model output: `먼지1# 주의보1 밖1 하지마1 내일1 오후1`
+
+Below is the final avatar animation completed by my teammate in Unity after switching to a
+compatible rigged model.
+
+<video
+  controls
+  playsInline
+  preload="metadata"
+  className="w-full rounded-xl"
+  aria-label="Final sign-language avatar animation completed in Unity"
+>
+  <source src="/media/sign-language/unity-final-animation.mp4" type="video/mp4" />
+</video>
+
+The team implemented the full flow from text to sign-language morphemes, 3D coordinates, and
+avatar motion. My contributions were the translation model and Blender-based error diagnosis. We
+did not design quantitative metrics for comparing translation quality across models, however, so
+this should be understood as an implementation of the end-to-end pipeline rather than a validated
+translation-quality result.

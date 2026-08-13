@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { getAllPosts, getAllProjects, getAllTags } from "@/lib/content";
+import { getAllEnglishProjects, getAllPosts, getAllProjects, getAllTags } from "@/lib/content";
 import { site } from "@/lib/site";
 
 // output: "export" 에서는 이 지시어가 없으면 빌드가 실패한다.
@@ -16,15 +16,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${site.url}${route}`,
     lastModified: posts[0]?.date,
   }));
+  const englishStaticRoutes = ["/en/", "/en/projects/", "/en/about/"].map((route) => ({
+    url: `${site.url}${route}`,
+  }));
 
   return [
     ...staticRoutes,
+    ...englishStaticRoutes,
     ...posts.map((post) => ({
       url: `${site.url}/blog/${post.slug}/`,
       lastModified: post.date,
     })),
     ...getAllProjects().map((project) => ({
       url: `${site.url}/projects/${project.slug}/`,
+    })),
+    ...getAllEnglishProjects().map((project) => ({
+      url: `${site.url}/en/projects/${project.slug}/`,
     })),
     ...getAllTags().map(({ slug }) => ({
       url: `${site.url}/tags/${slug}/`,

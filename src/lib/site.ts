@@ -7,6 +7,7 @@ export const site = {
   title: "sjkwon",
   // 화면에는 쓰지 않고 meta description 과 RSS 채널 설명으로만 나간다.
   description: "sjkwon 의 기술 블로그와 포트폴리오.",
+  descriptionEn: "The technical portfolio of Sejin Kwon.",
   url: "https://sjkwon-1023.github.io",
   locale: "ko_KR",
   author: {
@@ -26,13 +27,10 @@ export const nav = [
   { href: "/about/", label: "About" },
 ] as const;
 
-/**
- * 영어판이 실제로 존재하는 한국어 경로. 언어 토글은 이 목록에 있는 경로만 1:1 로 대응시키고,
- * 나머지(프로젝트 상세·블로그 등)에서는 영어 홈으로 보낸다 — 없는 주소로 링크하면 404 다.
- * nav 에서 파생하지 않고 따로 적는다. 메뉴에 항목을 되살렸을 때 영어판이 없는데도 링크가
- * 생기는 사고를 막기 위해서다. /en/ 아래 페이지를 추가하면 여기에도 경로를 추가한다.
- */
-export const EN_ROUTES = ["/", "/projects/", "/about/"] as const;
+/** 영어판이 있는 한국어 경로인지 확인한다. 블로그와 태그는 아직 한국어로만 제공한다. */
+export function hasEnglishVersion(pathname: string): boolean {
+  return pathname === "/" || pathname === "/about/" || pathname.startsWith("/projects/");
+}
 
 /**
  * 페이지가 alternates 를 선언하면 Next 는 루트의 alternates 를 병합하지 않고 통째로 갈아치운다.
@@ -47,6 +45,20 @@ export function alternatesFor(path: string) {
   return { canonical: path };
 }
 
+/** 한국어 원문과 영어 번역이 모두 있는 페이지의 canonical·hreflang 을 함께 만든다. */
+export function localizedAlternatesFor(koreanPath: string, locale: "ko" | "en") {
+  const englishPath = koreanPath === "/" ? "/en/" : `/en${koreanPath}`;
+
+  return {
+    canonical: locale === "ko" ? koreanPath : englishPath,
+    languages: {
+      ko: koreanPath,
+      en: englishPath,
+      "x-default": koreanPath,
+    },
+  };
+}
+
 /**
  * alternates 와 마찬가지로 openGraph 도 자식이 선언하면 통째로 교체된다. 매번 locale·siteName 을
  * 다시 적지 않도록 여기서 붙인다.
@@ -56,9 +68,10 @@ export function openGraphFor(options: {
   title: string;
   description: string;
   type?: "website" | "article";
+  locale?: "ko_KR" | "en_US";
   publishedTime?: string;
   tags?: string[];
 }) {
-  const { type = "website", ...rest } = options;
-  return { type, locale: site.locale, siteName: site.name, ...rest };
+  const { type = "website", locale = site.locale, ...rest } = options;
+  return { type, locale, siteName: site.name, ...rest };
 }

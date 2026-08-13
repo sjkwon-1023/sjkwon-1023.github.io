@@ -1,0 +1,65 @@
+---
+title: "RAG Document Retrieval"
+description: "Extended a gain from query rewriting into a document-rewriting hypothesis, improving retrieval and placing second in the competition."
+period: "Dec 2024"
+sortDate: "2024-12-16"
+tags: ["Competition"]
+role: "2-person team · Query/document rewriting experiments and embedding retrieval (Upstage AI Lab competition)"
+stack: ["Python", "Embedding", "TF-IDF", "HNSW", "LLM"]
+featured: false
+order: 1
+---
+
+This was a four-day competition to retrieve the documents relevant to either a standalone
+question or a multi-turn conversation and submit the top three results. The metric was mean
+average precision (MAP). In our
+first meeting, we split the work into two approaches—LLM-based retrieval and embedding
+retrieval—then ran them in parallel and shared the findings. On the two-person team, I handled
+query and document rewriting experiments and embedding retrieval.
+
+## Two retrieval paths from the first meeting
+
+The team's LLM-based path extracted keywords from each question, retrieved candidates with
+TF-IDF, and asked an LLM to choose the final three documents. It worked well for some questions,
+but its results varied substantially.
+
+For the embedding path, I compared six models.
+
+- KR-SBERT
+- KoSimCSE
+- klue/bert-base
+- BAAI/bge-large-en-v1.5
+- OpenAI text-embedding-3-small
+- Upstage embedding-query/passage
+
+Upstage embedding-query/passage performed best, with a MAP of 0.8848. I used this score as the
+baseline for subsequent experiments that changed the text representation.
+
+## From query rewriting to document rewriting
+
+After selecting the embedding model, I found that combining sparse and dense retrieval improved
+the score substantially over either method alone. Within hybrid retrieval, I compared the order
+of operations, score-combination weights, cosine and Euclidean distance, and HNSW index search.
+Changes to these details produced only small differences, so the next experiments changed the
+text being retrieved instead.
+
+Generating multiple similar questions as simple augmentation lowered the score. In contrast,
+having an LLM preserve the original intent while rewriting each question into a retrieval-oriented
+form produced a small improvement. I interpreted this as evidence that changing the representation
+to make comparison easier for the retriever mattered more than merely adding text.
+
+I then extended the same hypothesis to the document side. I restructured the document content into
+a form better suited to embedding retrieval and embedded that version separately. This produced
+the largest gain among the text-representation experiments.
+
+For the final submission, I combined candidates retrieved from the original questions and
+documents, rewritten questions, and rewritten documents. Rather than replace the originals with a
+single transformed representation, I retained the different candidates each representation found.
+
+## The result after four days
+
+The team was originally formed with four members, but two withdrew, leaving the two of us to
+run the actual competition. With only four days to test the LLM and embedding approaches in
+parallel, we did not train and apply a separate reranker. We began with an embedding-model
+comparison, but the decisive improvement came from adapting the representation of both questions
+and documents to retrieval and combining their results. We placed second overall.

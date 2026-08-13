@@ -29,7 +29,9 @@ npm run lint
 
 ## Adding content
 
-Posts live in `content/posts/`, projects in `content/projects/`. Copy the `_template.mdx`
-sitting in either directory, rename it, and fill in the frontmatter — the filename becomes
-the URL, so keep it lowercase with hyphens. Files must be `.mdx` (plain Markdown works
-inside it unchanged), and files starting with `_` are templates rather than content.
+Posts live in `content/posts/`, Korean projects in `content/projects/`, and their English
+translations in `content/en/projects/`. Copy the `_template.mdx` in the relevant directory,
+rename it, and fill in the frontmatter—the filename becomes the URL, so keep it lowercase
+with hyphens. Korean and English versions of a project must use the same filename. Files must
+be `.mdx` (plain Markdown works inside it unchanged), and files starting with `_` are templates
+rather than content.

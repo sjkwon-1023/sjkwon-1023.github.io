@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 import About from "@content/about.mdx";
-import { alternatesFor, openGraphFor, site } from "@/lib/site";
+import { localizedAlternatesFor, openGraphFor, site } from "@/lib/site";
 
 const DESCRIPTION = `${site.author.name} 소개`;
 
 export const metadata: Metadata = {
   title: "About",
   description: DESCRIPTION,
-  alternates: alternatesFor("/about/"),
+  alternates: localizedAlternatesFor("/about/", "ko"),
   openGraph: openGraphFor({ url: "/about/", title: "About", description: DESCRIPTION }),
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * 두 아이콘을 모두 서버 HTML 에 렌더하고 CSS(globals.css 의 .icon-light/.icon-dark)가
@@ -8,6 +9,9 @@ import { useEffect } from "react";
  * 보이는데 — 배경은 안 깜빡이는데 아이콘만 깜빡이는 흔한 버그 — 그걸 구조적으로 없앤다.
  */
 export function ThemeToggle() {
+  const pathname = usePathname();
+  const isEn = pathname === "/en" || pathname.startsWith("/en/");
+
   // 사용자가 명시적으로 고른 적이 없다면 OS 테마 변경을 실시간으로 따라간다.
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -23,7 +27,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label="라이트/다크 테마 전환"
+      aria-label={isEn ? "Toggle light/dark theme" : "라이트/다크 테마 전환"}
       className="grid size-9 place-items-center rounded-md text-fg-muted transition-colors hover:bg-bg-subtle hover:text-fg"
       onClick={() => {
         const root = document.documentElement;

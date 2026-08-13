@@ -1,0 +1,235 @@
+---
+title: "Pretraining a 110M-Parameter Korean Language Model"
+description: "Compared a random baseline with three curriculum conditions across two learning-rate settings in eight training runs."
+period: "Aug 2026"
+sortDate: "2026-08-10"
+tags: ["Independent Research"]
+role: "Solo · Experimental design, data, training pipeline, and evaluation"
+stack: ["Python", "PyTorch", "Hugging Face", "kiwipiepy", "RunPod"]
+featured: false
+order: 1
+---
+
+## Question: Does learning from easy examples first make training faster?
+
+When pretraining a Korean language model from scratch, does presenting the same data from easy to difficult help
+the model learn faster than random shuffling? Because ordering can be changed without changing either the dataset
+or model size, it was worth isolating its effect. I trained a 110M-parameter model on a single pass over 2.5
+billion tokens and compared a random baseline with three curriculum conditions.
+
+The four orders were:
+
+- `random`: the baseline, with all data randomly shuffled
+- `length`: divide sentences into ten bands by length and train from shortest to longest
+- `difficulty`: train in ascending order of difficulty calculated from morphological statistics
+- `mixed`: mix 10–15% of the next difficulty band into the current band during training
+
+`random`, `length`, and `difficulty` used the same corpus and changed only its order. `mixed` replaced the most
+difficult 10% of tokens with easier data, so it includes a data-selection effect as well as an ordering effect. I
+treated it as a separate condition from the outset to avoid interpreting that difference as a pure ordering
+effect. All four conditions used exactly 2.5 billion training tokens.
+
+## Holding everything constant except order
+
+The model is a 110M-parameter decoder-only Transformer. It uses Llama-family RMSNorm, RoPE, and SwiGLU; I
+implemented both the model and training loop directly in PyTorch. The tokenizer is a 32k byte-level BPE trained
+with Hugging Face Tokenizers, and the input and output embeddings share weights.
+
+| Data source | Measured share | License |
+| --- | --- | --- |
+| FineWeb2 `kor_Hang` (pinned revision) | 76.6% | ODC-By 1.0 |
+| National Institute of Korean Language's Modu Corpus | 15.0% | Research use; redistribution prohibited |
+| Korean Wikipedia 20231101 | 8.4% | CC BY-SA 4.0 |
+
+I cleaned 4.55 million documents containing 6.8 billion characters to create a training pool of 2.94 billion
+tokens under the custom BPE. Processing included NFC normalization, Korean-character-ratio and length filters,
+and exact deduplication with BLAKE2 hashes. Content hashes determined the train/validation split, ensuring that a
+rerun assigns the same document to the same split. I used 8.32 million paragraph-preserving chunks of at most 512
+tokens as the ordering units.
+
+The shared corpus C for `random`, `length`, and `difficulty` contained 7.06 million chunks. For `mixed`, I removed
+713,554 chunks from the highest-difficulty band (250 million tokens) and replaced them with 710,017 chunks from
+the easiest 75% of the data, matching the total token count exactly.
+
+I tested that runs with the same seed started from identical initial weights and generated each data order as a
+file before training so it remained fixed. Sentence-level shuffling could itself make the baseline a nonstandard
+training setup, so I chose chunks of at most 512 tokens as the unit of ordering.
+
+Training ran in bf16 on a single RTX 4090 24GB instance in RunPod Secure Cloud. Throughput was approximately
+90,000 tokens per second, each run took about 7.8 hours, and the full set of training and evaluation runs cost
+roughly USD 55–60. I initially planned three seed repetitions. After reviewing the first-seed results, however, I
+concluded that a potential confound between the learning-rate schedule and data order needed to be addressed
+first. I therefore prioritized four fixed-learning-rate runs with the same seed and corresponding data order over
+repeating seeds, comparing eight runs in total:
+four cosine-schedule runs and four fixed-rate runs.
+
+## Making the experiment reproducible
+
+I separated data collection, preprocessing, tokenizer training, tokenization, difficulty scoring, order
+generation, training, and evaluation into the staged CLI
+`main.py prepare → tokenizer → score → orders → train → eval → plot`. `manifest.json` records dataset revisions
+and the exact data used, while `orders/meta.json` records the pregenerated order and hash for each condition. I
+tested that comparison runs began from the same initial weights. For the fixed-LR reruns, I held the seed and
+order constant and changed only `lr = min_lr = 3e-4`.
+
+I also fixed checkpoint restoration to recover not only the data position but the CUDA RNG state, preventing loss
+from changing across an interrupted-and-resumed run. In the process, I found that the checkpoint's
+`map_location` moved even RNG-state tensors to the GPU and prevented their restoration. This code path was not
+covered by CPU tests, so I changed the operating procedure to include a short interruption-and-resumption check
+on the actual training device before a full run.
+
+Hugging Face Datasets and Hub were used to retrieve corpora and benchmarks, while Tokenizers was used to train
+the BPE. Transformers was used only in evaluation code that loaded external reference models; the experimental
+model and its training loop were implemented directly in PyTorch. During KoGPT2 evaluation, I also found that
+the Transformers GPT-2 wrapper split Korean tokenizer input at the byte level. I added a probe for Korean tokens
+and loaded the raw `tokenizers.Tokenizer` instead. Producing a number and measuring the intended quantity are not
+the same thing.
+
+## Results opposite to the hypothesis
+
+| Condition | Final val loss | Tokens to target loss (3.645) | Final bits per character (BPC) |
+| --- | --- | --- | --- |
+| **random** | **3.505** | **1.38B tokens** | **2.304** |
+| mixed | 3.582 | 1.66B | 2.369 |
+| difficulty | 3.632 | 1.81B | 2.470 |
+| length | 3.645 | 1.99B | 2.414 |
+
+The curriculum conditions required approximately 20–44% more tokens than `random` to reach the same loss. Their
+rank order remained unchanged at every intermediate checkpoint, and the validation loss for `length` even rose
+slightly from 3.643 to 3.645 near the end of training.
+
+![Validation-loss curves by condition](/figures/ko-curriculum/val_loss.png)
+
+Aggregate loss alone could not explain the ranking, so I split validation results into difficulty bands. The
+loss gaps between `difficulty` and `random` were +0.262 on easy data, +0.080 on medium data, and +0.017 on hard
+data. The easy-band loss under curriculum training stopped improving after 1.2 billion tokens, consistent with
+the explanation that performance deteriorated because the model never revisited the easy examples seen early in
+training.
+
+![Validation loss by difficulty band](/figures/ko-curriculum/val_loss_bands.png)
+
+## Testing whether the learning rate caused the result
+
+Under a cosine schedule, difficult data always appears in the low-learning-rate portion of training. Before
+calling the initial result an ordering effect, I needed to examine this confound. I therefore retrained all four
+conditions with the same seed and data order while holding the learning rate fixed at 3e-4.
+
+With the fixed learning rate, `difficulty`'s validation-loss gap relative to `random` increased from +0.127 to
++0.176, and the easy-band gap grew from +0.262 to +0.369. The condition ranking also remained unchanged. If
+cosine decay had created the apparent effect, these gaps should have narrowed; instead, they widened. Cosine
+decay alone therefore could not explain the difference, leaving the failure to revisit easy data as the leading
+explanation.
+
+![Fixed-learning-rate reruns](/figures/ko-curriculum/lr_ablation.png)
+
+## Does the pattern hold beyond loss?
+
+I shuffled outputs for 20 fixed prompts without revealing condition names and asked two LLM judges to compare
+them. Among cases where both judges chose the same winner, `random` beat `difficulty` 12–2; a two-sided binomial
+test yielded p ≈ 0.013. `random` also led `length` 10–5 and `mixed` 9–6, but neither comparison was statistically
+significant.
+
+I also evaluated KoBEST, KoBALT-700, and a custom grammaticality minimal-pair set. Every condition reached
+96–99% on the minimal pairs within 0.5 billion tokens, while all models remained at chance on KoBALT, so neither
+benchmark distinguished the conditions. Having an accuracy number is not the same as having a benchmark that
+can resolve differences between models at this scale. In this experiment, continuous measures—validation loss
+and BPC—captured the effect of data order most reliably.
+
+![Additional benchmark results](/figures/ko-curriculum/benchmarks.png)
+
+### Comparison with external open-weight models
+
+I evaluated the eight final checkpoints and three external models with the same harness. Because their tokenizers
+differed, all options were scored by log probability normalized by character length.
+
+<div className="overflow-x-auto">
+
+| Model | MinPair | COPA | HSwag | BoolQ | SentiNeg | KoBALT |
+| --- | --- | --- | --- | --- | --- | --- |
+| random (cosine) | 0.989 | 0.558 | 0.428 | 0.464 | **0.848** | 0.077 |
+| mixed (cosine) | 0.991 | 0.570 | 0.402 | 0.471 | 0.762 | 0.074 |
+| difficulty (cosine) | 0.989 | 0.550 | 0.414 | 0.469 | 0.835 | 0.080 |
+| length (cosine) | 0.991 | 0.542 | 0.404 | 0.474 | 0.755 | 0.084 |
+| random (fixed LR) | 0.989 | 0.546 | 0.434 | 0.463 | 0.802 | 0.099 |
+| mixed (fixed LR) | 0.984 | 0.544 | 0.404 | 0.470 | 0.792 | 0.091 |
+| difficulty (fixed LR) | 0.984 | 0.552 | 0.380 | 0.461 | 0.620 | 0.086 |
+| length (fixed LR) | 0.979 | 0.532 | 0.376 | 0.464 | 0.743 | 0.079 |
+| KoGPT2 125M | 0.993 | 0.558 | 0.426 | 0.473 | 0.662 | 0.096 |
+| Gemma 3 270M PT | 0.980 | 0.568 | 0.488 | 0.531 | 0.585 | 0.076 |
+| EXAONE 4.0 1.2B | 0.864 | 0.582 | 0.426 | 0.481 | 0.815 | 0.099 |
+
+</div>
+
+The external models are anchors for estimating absolute performance, not fair ranking opponents: they differ in
+training-data volume, tokenizer, and tuning method. EXAONE in particular is an instruction-tuned model and may
+be disadvantaged on MinPair, which compares raw-sentence log probabilities.
+
+## Insights from the experiment
+
+### A curriculum is a revisit schedule, not merely a sorting rule
+
+In a one-pass curriculum from easy to difficult, difficulty becomes inseparable from training time. Easy texts
+seen early are never revisited, while difficult texts seen later receive the final parameter updates. In this
+experiment, the deficit for `difficulty` was concentrated not in the hard band (+0.017), but in the easy band
+(+0.262), and the same pattern became stronger under a fixed learning rate. What mattered most was therefore not
+**what the model saw first, but what it never saw again**.
+
+This result suggests that sorting by difficulty alone is not enough when designing a pretraining curriculum.
+Rehearsal that periodically reintroduces easy data, or interleaving across difficulty bands, must be treated as
+part of the schedule. The fact that `mixed` lost less ground than the fully sorted conditions is consistent with
+its preview of the next band making the distribution shift more gradual while also increasing the share of easy
+data. Because `mixed` changes both factors, however, this experiment cannot separate the contribution of
+previewing from that of data selection.
+
+### Data fit partly offset model size on some tasks
+
+An unexpected result emerged from the comparison with external open-weight models. This 110M model, pretrained
+only on Korean, performed comparably to KoGPT2 125M and Gemma 3 270M on the grammaticality minimal pairs and
+achieved the highest SentiNeg score among the comparison models, including EXAONE 4.0 1.2B. One plausible
+interpretation is that, while much larger general-purpose models divide their capacity across multiple languages
+and tasks, the smaller model devoted all of its limited capacity to the Korean distribution.
+
+This cannot be generalized into a claim that a small model understands Korean better than a large one. It showed
+no consistent advantage on COPA, HellaSwag, or BoolQ, and every model remained at chance on KoBALT. The comparison
+supports a narrower conclusion: **on tasks close to the training distribution, such as grammaticality and
+sentiment, data specialization can partly compensate for a smaller parameter count, but it cannot substitute for
+reasoning capacity**. Because the models also differ in training-data volume and tuning method, this is not a
+causal estimate of the effect of Korean-only pretraining.
+
+## Questions for the next experiment
+
+### Does repetition eliminate forgetting?
+
+If forgetting caused the result, the next experiment makes a clear prediction. Keeping the total token count
+fixed, I could reduce the corpus to one quarter and train for four epochs, comparing reshuffling each epoch,
+repetition of the full curriculum cycle (spaced), and repetition of difficulty-band blocks (blocked). Under the
+cyclical schedule, which revisits the easy band periodically, the increase in easy loss observed here should
+disappear. This would also compare blocked and interleaved practice from cognitive science in the setting of
+language-model pretraining.
+
+### Does the advantage of specialization generalize to other domains?
+
+The anchor comparison suggests a hypothesis: a small specialized model can outperform a larger general model on
+**distribution-fit** tasks, but cannot replace the minimum model capacity required for **reasoning tasks**. For a
+small code-specific model, this predicts efficiency on syntax and autocomplete but
+a minimum capacity of about 1B parameters for algorithmic problem solving. The same structure could be tested in
+vision by pairing a small captioner with a text LLM and asking whether the caption's information bottleneck sets
+an upper bound on final performance.
+
+## What this experiment cannot yet establish
+
+- **There was only one seed.** Paired comparisons with identical initial weights and the same ordering across two
+  learning-rate settings provide supporting evidence, but I did not estimate variance between conditions. These
+  results therefore support a mechanism within this setup, not a general conclusion about curriculum learning.
+- **`mixed` combines data-selection and ordering effects.** Its preview ratio is also based on chunk counts rather
+  than tokens, so differences in chunk length across bands can change the actual token ratio.
+- **Generation was evaluated by LLM judges.** The evaluation compared 20 prompts at one final checkpoint, and the
+  only statistically significant matchup was `random` versus `difficulty`.
+- **Some Ko-MinPair categories differ in length.** For 80 pairs covering an instrumental/directional
+  particle, conjugation, and honorifics, the good and bad sentences differ by roughly one character.
+  This can introduce a directional bias in summed log probabilities, so I interpreted those categories
+  separately.
+- **Web-corpus deduplication used exact-match hashes only.** Near-duplicates may remain.
+- **The external models are reference points.** Their training-data volumes differ by tens to thousands of times;
+  EXAONE is instruction-tuned and Gemma uses a multilingual 262k vocabulary, so this is not a comparison that
+  controls everything except parameter count.

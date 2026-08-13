@@ -11,6 +11,7 @@ import matter from "gray-matter";
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const POSTS_DIR = path.join(CONTENT_DIR, "posts");
 const PROJECTS_DIR = path.join(CONTENT_DIR, "projects");
+const EN_PROJECTS_DIR = path.join(CONTENT_DIR, "en", "projects");
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -264,14 +265,12 @@ export function getPostsByTag(tag: string): Post[] {
 }
 
 let projectCache: Project[] | null = null;
+let englishProjectCache: Project[] | null = null;
 
-export function getAllProjects(): Project[] {
-  // getAllPosts 와 같은 이유로 dev 에서는 캐시하지 않는다.
-  if (projectCache && process.env.NODE_ENV !== "development") return projectCache;
-
-  projectCache = readMdxFiles(PROJECTS_DIR)
+function readProjects(dir: string, sourcePrefix: string): Project[] {
+  return readMdxFiles(dir)
     .map(({ slug, raw }) => {
-      const source = `content/projects/${slug}.mdx`;
+      const source = `${sourcePrefix}/${slug}.mdx`;
       const { data } = matter(raw);
       return {
         slug,
@@ -294,12 +293,52 @@ export function getAllProjects(): Project[] {
         a.order - b.order ||
         a.title.localeCompare(b.title),
     );
+}
+
+export function getAllProjects(): Project[] {
+  // getAllPosts 와 같은 이유로 dev 에서는 캐시하지 않는다.
+  if (projectCache && process.env.NODE_ENV !== "development") return projectCache;
+
+  projectCache = readProjects(PROJECTS_DIR, "content/projects");
 
   return projectCache;
 }
 
 export function getProject(slug: string): Project | undefined {
   return getAllProjects().find((p) => p.slug === slug);
+}
+
+/**
+ * 영어 프로젝트는 한국어 원문과 slug 를 1:1 로 맞춘다. 상세 페이지의 언어 토글이 같은 slug 로
+ * 이동하므로, 번역 누락이나 원문 없이 생긴 파일을 조용히 배포하면 한쪽 언어에서 404 가 난다.
+ */
+export function getAllEnglishProjects(): Project[] {
+  if (englishProjectCache && process.env.NODE_ENV !== "development") {
+    return englishProjectCache;
+  }
+
+  const projects = readProjects(EN_PROJECTS_DIR, "content/en/projects");
+  const koreanSlugs = new Set(getAllProjects().map((project) => project.slug));
+  const englishSlugs = new Set(projects.map((project) => project.slug));
+  const missing = [...koreanSlugs].filter((slug) => !englishSlugs.has(slug));
+  const orphaned = [...englishSlugs].filter((slug) => !koreanSlugs.has(slug));
+
+  if (missing.length > 0 || orphaned.length > 0) {
+    const details = [
+      missing.length > 0 ? `번역 누락: ${missing.join(", ")}` : "",
+      orphaned.length > 0 ? `한국어 원문 없음: ${orphaned.join(", ")}` : "",
+    ]
+      .filter(Boolean)
+      .join("; ");
+    throw new Error(`content/en/projects 의 slug 가 한국어 프로젝트와 일치하지 않습니다 (${details})`);
+  }
+
+  englishProjectCache = projects;
+  return englishProjectCache;
+}
+
+export function getEnglishProject(slug: string): Project | undefined {
+  return getAllEnglishProjects().find((project) => project.slug === slug);
 }
 
 /** YYYY-MM-DD 를 화면용 한국어 날짜로. Date 를 만들지 않아 타임존 영향이 없다. */

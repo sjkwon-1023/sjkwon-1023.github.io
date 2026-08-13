@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-/** 정적 export 시 out/404.html 로 나가고, GitHub Pages 가 그대로 404 페이지로 쓴다. */
+/** 한국어 라우트 안에서 notFound()가 호출됐을 때 쓰는 화면. 전역 404는 global-not-found.tsx. */
 export default function NotFound() {
   return (
     <main className="mx-auto flex max-w-(--container-prose) flex-col items-start px-6 py-24 md:px-8">

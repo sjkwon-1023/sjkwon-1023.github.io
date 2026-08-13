@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getAllProjects, getProject } from "@/lib/content";
-import { alternatesFor, openGraphFor } from "@/lib/site";
+import { localizedAlternatesFor, openGraphFor } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -23,7 +23,7 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.description,
-    alternates: alternatesFor(`/projects/${project.slug}/`),
+    alternates: localizedAlternatesFor(`/projects/${project.slug}/`, "ko"),
     openGraph: openGraphFor({
       type: "article",
       url: `/projects/${project.slug}/`,

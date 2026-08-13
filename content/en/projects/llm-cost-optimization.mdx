@@ -1,0 +1,57 @@
+---
+title: "Optimizing LLM Item-Validation Costs"
+description: "A PoC comparing a lower-cost commercial model with log-probability classification to improve consistency in item evaluation."
+period: "Dec 2025"
+sortDate: "2025-12-01"
+tags: ["Professional Work", "PoC"]
+role: "BookIPs · AI Engineer"
+stack: ["Python", "LLM API", "Log Probability", "Prefect", "Batch Evaluation"]
+featured: false
+order: 2
+---
+
+The first problem I set out to solve was evaluation consistency, not cost. When a generative LLM serves as the
+judge, its response format and decision can vary even under the same criteria. Large batches therefore needed a
+repeatable method of automated evaluation.
+
+Cost still mattered. LLM spending on batch generation of English questions had reached roughly KRW 20 million
+(about US$15,000), and post-generation validation with a high-end model cost roughly KRW 50 (US$0.04) and took
+30 seconds per item. This PoC, however, targeted the per-item validation cost—not the entire accumulated
+generation cost.
+
+## A lower-cost commercial model instead of a local small language model
+
+Reliable access to local GPU resources was difficult at the time, so I excluded self-hosting a small language
+model (SLM). Instead, I
+considered lower-cost commercial API models that could be compared directly within the existing pipeline. The
+cost figures below are estimates calculated from the sample's input and output token usage and the API pricing at
+the time, not production invoices.
+
+## Changing the decision method before changing the model
+
+Simply asking a lower-cost model for the same free-form evaluation would not make it easy to compare both cost
+and decision stability. Instead of having the validation model generate an explanation, I built logic that
+compared the log probabilities of candidate labels. The task needed a pass/fail decision, not a long answer.
+
+I compared the lower-cost commercial model's decisions with those of the existing high-end model, examining
+cost, processing time, agreement, and reproducibility across repeated runs. To hold conditions constant, I reran
+the experiment within the Prefect-based generation, validation, and loading pipeline.
+
+## PoC results
+
+| | Existing judge | PoC candidate |
+| --- | --- | --- |
+| Estimated token cost per item | Approx. KRW 50 (US$0.04) | Approx. KRW 5 (US$0.004; −90%) |
+| Processing time per item | Approx. 30 sec | Approx. 15 sec (−50%) |
+
+Within the PoC sample, every decision matched the existing high-end model. This was agreement with the incumbent
+model, not accuracy measured against human-annotated ground truth. Within that scope, the experiment showed the
+potential to separate validation into a cheaper model and a shorter classification task.
+
+## What the PoC did not establish
+
+Although every decision matched within the sample, this alone does not show that quality would hold across other
+item types or larger batches. The project schedule did not allow expansion to type-stratified samples or
+validation under production conditions, so the approach was not deployed in the live pipeline. This result is
+therefore not a realized cost saving; it is a PoC that suggested a lower-cost commercial model might be viable
+and narrowed the scope of the next validation study.

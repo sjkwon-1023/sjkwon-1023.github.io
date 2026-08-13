@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getAllProjects } from "@/lib/content";
-import { openGraphFor, site } from "@/lib/site";
+import { localizedAlternatesFor, openGraphFor, site } from "@/lib/site";
 
 const HEADLINE = "건축설계로 일을 시작해, 지금은 AI 제품을 만듭니다";
 
 export const metadata: Metadata = {
   description: HEADLINE,
+  alternates: localizedAlternatesFor("/", "ko"),
   openGraph: openGraphFor({
     url: "/",
     title: site.title,
