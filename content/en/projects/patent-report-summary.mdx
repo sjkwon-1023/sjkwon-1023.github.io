@@ -32,9 +32,9 @@ summarization.
 | Refine | Pass the previous chunk's summary into the next request | The growing summary leaves progressively less context for later chunks |
 
 Refine preserved earlier context more effectively, but left less and less token capacity for the end of the
-document. Map Reduce divided long documents reliably, but its outputs felt disconnected. I used Map Reduce to
-summarize individual chunks, then added a stage that rewrote the combined summary for continuity and consistent
-formatting.
+document. Map Reduce divided long documents reliably, but produced fragmented summaries with inconsistent
+transitions between chunks. I used Map Reduce to summarize individual chunks, then added a stage that rewrote
+the combined summary for continuity and consistent formatting.
 
 The resulting workflow converted each PDF to text, ran one or two summarization passes depending on length, and
 then rewrote the final summary to retain the patents at issue, response strategies, and country-specific details.

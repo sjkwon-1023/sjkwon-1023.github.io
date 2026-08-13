@@ -5,7 +5,7 @@ period: "May 2025"
 sortDate: "2025-05-21"
 tags: ["Personal Project"]
 role: "Solo · Product design, implementation, and deployment"
-stack: ["React", "LangGraph", "Netlify"]
+stack: ["React", "React Flow", "LangGraph", "Netlify"]
 repo: "https://github.com/sjkwon-1023/langgraph_cad"
 demo: "https://langgraph-cad.netlify.app/"
 featured: false
@@ -17,10 +17,12 @@ glance when designing LangGraph structures directly in code. I built this small 
 could pull it up whenever a graph became complex.
 
 Drag nodes and edges onto the canvas on the left, and matching LangGraph code appears immediately on the right.
-The tool distinguishes regular from conditional edges and emits conditional connections with
-`add_conditional_edges`.
+The canvas uses React Flow for drag-and-drop nodes, connections, and editable custom edge paths. During code
+generation, the tool traces the node entering each conditional node, groups its outgoing targets, and emits that
+branch with `add_conditional_edges`; other connections become `add_edge` calls.
 
 I could have diagrammed the structure in n8n, but the required output was LangGraph code for the production service.
 Instead of installing and operating a workflow platform, I focused on moving directly from visual design to
-code. The current design state is encoded in the URL, with no server or persistence layer, and the tool is
-deployed on Netlify so it can be used without installation as needed.
+code. The tool serializes the nodes, edges, entry point, and graph name as JSON in the URL hash, allowing the same
+URL to reconstruct and share a design without a server or persistence layer. It is deployed on Netlify so it can
+be used without installation as needed.
