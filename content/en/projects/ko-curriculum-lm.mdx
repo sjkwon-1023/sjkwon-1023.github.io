@@ -225,8 +225,8 @@ an upper bound on final performance.
   than tokens, so differences in chunk length across bands can change the actual token ratio.
 - **Generation was evaluated by LLM judges.** The evaluation compared 20 prompts at one final checkpoint, and the
   only statistically significant matchup was `random` versus `difficulty`.
-- **Some Ko-MinPair categories differ in length.** For 80 pairs covering the Korean particle
-  (으)로, conjugation, and honorifics, the good and bad sentences differ by roughly one character.
+- **Some Ko-MinPair categories differ in length.** For 80 pairs covering an instrumental/directional
+  particle, conjugation, and honorifics, the good and bad sentences differ by roughly one character.
   This can introduce a directional bias in summed log probabilities, so I interpreted those categories
   separately.
 - **Web-corpus deduplication used exact-match hashes only.** Near-duplicates may remain.
