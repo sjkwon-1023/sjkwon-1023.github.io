@@ -28,6 +28,12 @@ cmux 사용 시 없어서 아쉬웠던 폴더 탐색기와 text·Markdown viewer
 한 번에 전부 읽지 않고 512KiB 단위 window로 가져와, viewer 하나 때문에 앱의 메모리 사용량이
 크게 늘지 않도록 했습니다.
 
+아래는 실제로 작업 중인 화면입니다. 왼쪽 sidebar에는 workspace별로 입력 대기·유휴 상태와 마지막
+메시지가 표시되고, 오른쪽에는 코딩 에이전트 두 개와 폴더 탐색기, 파일 viewer가 각각 pane으로
+나뉘어 있습니다.
+
+![winmux 화면 — 왼쪽 sidebar의 workspace별 에이전트 상태와 코딩 에이전트 두 개·폴더 탐색기·파일 viewer로 나뉜 네 개의 pane](/media/winmux/workspace-overview.png)
+
 ## WSL2 전용이라는 경계를 먼저 정하기
 
 winmux에서 terminal을 연다는 것은 항상 `ConPTY → wsl.exe → login shell`을 실행한다는 뜻입니다.

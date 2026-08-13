@@ -29,6 +29,12 @@ output files in the same window while an agent works. Large files are loaded in 
 instead of all at once, keeping a single viewer from substantially increasing the application's
 memory use.
 
+The screenshot below shows a working session. The sidebar on the left reports the waiting and idle
+states of each workspace along with its latest message, while the right side is split into panes
+for two coding agents, the file explorer, and a file viewer.
+
+![The winmux interface — per-workspace agent status in the left sidebar, with four panes holding two coding agents, the file explorer, and a file viewer](/media/winmux/workspace-overview.png)
+
 ## Defining a WSL2-only boundary first
 
 Opening a terminal in winmux always means launching `ConPTY → wsl.exe → login shell`.
