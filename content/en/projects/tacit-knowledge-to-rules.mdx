@@ -21,7 +21,7 @@ the pipelines the service needed.
 This was not an experimental notebook, but a production pipeline for generating, validating, and
 loading questions. Depending on the question type, the system generated
 batches of 20,000–90,000 questions. The same generation modules also served real-time user
-requests. Cumulative LLM spending for batch generation was roughly KRW 20 million (about US$15,000).
+requests. Cumulative LLM spending for batch generation ran into the tens of millions of won.
 
 For the service pipeline, the team jointly built the Python and FastAPI microservices,
 Prefect-based orchestration, and the dbt and PostgreSQL data pipeline. The team's backend was
@@ -30,8 +30,8 @@ supplied through dependency injection. In that environment, I contributed to bac
 implementation from the initial development phase and worked on type-specific LLM generation and
 validation logic and prompt engineering.
 
-Some question types used ML models that had been trained before I joined. I helped serve those
-models and connect their outputs to the LLM pipeline.
+Some question types used in-house-trained ML models, and I also took part in serving those
+models and connecting their outputs to the LLM pipeline.
 
 ## Generation logic
 
@@ -66,11 +66,11 @@ accumulated.
 
 ## Quality
 
-The initial internal review pass rate increased from under 10% to about 70%. Questions ultimately
-delivered through the system received no quality complaints over six months, and a content
-specialist described some outputs as “better than those written by an average professional item
-writer.” These results did not come from one model alone. They came from connecting type-specific
-criteria, automated checks, and expert review through a shared vocabulary.
+For raw output before the validation logic ran, the expert review pass rate rose from under 10%
+to about 70%, and the questions ultimately delivered after validation maintained zero quality
+complaints over six months. These numbers came less from any single model's performance than
+from connecting the type-specific generation logic, the evaluation pipeline, and the experts'
+item-writing logic.
 
 ## Related projects
 

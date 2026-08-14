@@ -17,14 +17,12 @@ process from a different angle: which steps are repetitive, and where human judg
 ## Choosing the first problem to solve
 
 As the only in-house developer in an organization of roughly 100 people, I handle workflow analysis, development
-priorities, service implementation, cloud infrastructure, and adoption by design teams. My 20 months of hands-on
-experience designing apartment complexes and urban-renewal projects helped me identify where designers spend
-their time and where professional review is indispensable.
+priorities, service implementation, cloud infrastructure, and adoption by design teams.
 
-The analysis showed that proposal-stage schematic design consumed the most staff time. Site assessment, site planning,
+Analysis of internal work logs showed that proposal-stage schematic design consumed the most staff time. Site assessment, site planning,
 modeling, aerial renderings, and presentation materials followed one another, and a single cycle typically
-took two to three weeks. Rather than optimizing one isolated feature first, I prioritized connecting this workflow
-one stage at a time.
+took two to three weeks. Rather than refining one isolated feature first, I decided to develop this flow module by
+module with the full pipeline in mind.
 
 ## Why I did not automate everything at once
 
@@ -32,11 +30,11 @@ Many stages of schematic design depend more on review than on generation. Instea
 process at once, I divided it into replaceable modules: AI produces a draft or first-pass evaluation, and a
 designer makes the final decision.
 
-For aerial rendering, I consolidated the prompting practices that had varied from employee to employee into
-criteria built into the tool. Image generation and initial evaluation by large language and vision-language models
-(LLMs/VLMs) are automated, but users review the results and choose the final image. The system records their
-selections, regeneration requests, and ratings for
-weekly feedback, retaining not only the deliverables but also the data needed for the next round of improvements.
+For aerial rendering, I consolidated the prompting practices that had varied from employee to employee and used
+an Evaluation agent to cut the time spent on simple repetition. Image generation and initial evaluation by large
+language and vision-language models (LLMs/VLMs) are automated, but users review the results and choose the final
+image. The system stores their selections, regeneration requests, and ratings and feeds them back into
+self-improvement, retaining not only the deliverables but also the data needed to improve the Evaluation agent.
 
 Another bottleneck in the aerial-rendering pipeline was the 3D modeling stage. Once the site plan is complete,
 a model has to be built to match it, but proficiency with 3D tools varied widely among staff and the stage took
@@ -48,10 +46,12 @@ modeling tool.
 ## The foundation that had to come before AI
 
 If work conversations and documents do not accumulate as company assets, it becomes difficult to connect future
-workflow systems or knowledge retrieval. I led the adoption of Microsoft 365, Teams, and Outlook, compared
-products and contract terms, and secured terms that reduced costs by approximately 15% relative to list price. I structured the
-environment so that materials remain under company accounts and designed a data model that future work-log and
-project-management systems can share.
+workflow systems or knowledge retrieval. The company had no internal messenger and work ran over personal
+messengers, so I judged that turning internal knowledge into data had to come first. I led the adoption of
+Microsoft 365, Teams, and Outlook, compared products and contract terms, and secured terms that reduced costs by
+approximately 15% relative to list price. I structured the environment so that materials remain under company
+accounts and designed an internal knowledge-retrieval system to be built alongside the future work-log and
+project-management systems.
 
 The internal services use FastAPI and Next.js. I manage GCP Cloud Run, Cloud SQL, GCS, and Secret Manager with
 Terraform, and built keyless CI/CD with GitHub Actions and Workload Identity Federation (WIF)/OIDC.
