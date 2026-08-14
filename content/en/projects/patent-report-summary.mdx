@@ -15,9 +15,9 @@ pages that a nonspecialist could understand. Document length was only part of th
 from 20 to more than 600 pages, used different patent-firm templates, and mixed Korean with English, Japanese,
 and Chinese.
 
-## Working within 8,192 tokens
+## Overcoming the context length limit
 
-The company requirements were explicit. We could not use a separate GPU instance, and the reports came from a
+Under the company's requirements, we could not use a separate GPU instance, and the reports came from a
 public-sector intellectual-property support program, so we had to use a Naver API covered by an
 intermediate-level or higher Cloud Security Assurance Program (CSAP) certification. Open-source models were
 therefore not an option, and we used HyperCLOVA X, which met the requirements at the time.
@@ -32,23 +32,22 @@ summarization.
 | Refine | Pass the previous chunk's summary into the next request | The growing summary leaves progressively less context for later chunks |
 
 Refine preserved earlier context more effectively, but left less and less token capacity for the end of the
-document. Map Reduce divided long documents reliably, but produced fragmented summaries with inconsistent
+document—for longer reports, too little context remained to summarize the later sections. Map Reduce divided long documents reliably, but produced fragmented summaries with inconsistent
 transitions between chunks. I used Map Reduce to summarize individual chunks, then added a stage that rewrote
 the combined summary for continuity and consistent formatting.
 
 The resulting workflow converted each PDF to text, ran one or two summarization passes depending on length, and
 then rewrote the final summary to retain the patents at issue, response strategies, and country-specific details.
 
-## Document retrieval added later
+## Vector document retrieval
 
 After the summarization module was complete, the company requested embedding-based retrieval of related
-documents. This was a scope expansion during the project, not part of the original summarization requirements. I
-used an LLM to extract keywords from the final summaries and compared them with the existing TF-IDF results. I
-also implemented both TF-IDF and embedding-based vector retrieval, verifying the distinction between exact
-term overlap, which the existing approach could capture, and documents containing synonyms or semantically
-related terms, which vector search could retrieve.
+documents. I used an LLM to extract keywords from the final summaries and compared them with the existing
+TF-IDF results. I also implemented both TF-IDF and embedding-based vector retrieval, so that documents with
+exact term overlap could be found by the existing approach and documents containing synonyms or semantically
+related terms by vector search.
 
-## Deliverables
+## Results
 
 I implemented the summaries—including patents at issue, response strategies, and country-specific details—and
 the document-retrieval feature. The project concluded after loading the results into the company's database and

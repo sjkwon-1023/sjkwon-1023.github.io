@@ -38,15 +38,18 @@ criteria built into the tool. Image generation and initial evaluation by large l
 selections, regeneration requests, and ratings for
 weekly feedback, retaining not only the deliverables but also the data needed for the next round of improvements.
 
-For the modeling stage, I developed a beta tool that connects map-based building-registry lookup with DXF and
-SketchUp Model Context Protocol (MCP) integrations. The next step is to connect site planning and
-presentation-material generation.
+Another bottleneck in the aerial-rendering pipeline was the 3D modeling stage. Once the site plan is complete,
+a model has to be built to match it, but proficiency with 3D tools varied widely among staff and the stage took
+far more time than its difficulty warranted, so I moved forward with modeling automation. I developed a Model
+Context Protocol (MCP)-based modeling agent that takes the site plan as DXF input, performs the work that code
+can handle — floor-count recognition, extraction of position coordinates — and pushes the results into the 3D
+modeling tool.
 
 ## The foundation that had to come before AI
 
 If work conversations and documents do not accumulate as company assets, it becomes difficult to connect future
 workflow systems or knowledge retrieval. I led the adoption of Microsoft 365, Teams, and Outlook, compared
-products and contract terms, and secured terms that reduced costs by approximately 15%. I structured the
+products and contract terms, and secured terms that reduced costs by approximately 15% relative to list price. I structured the
 environment so that materials remain under company accounts and designed a data model that future work-log and
 project-management systems can share.
 
@@ -55,6 +58,7 @@ Terraform, and built keyless CI/CD with GitHub Actions and Workload Identity Fed
 
 ## Current status
 
-The rendering assistant and modeling-automation tool are still under development and rollout. This is not yet an
-end-to-end automation system for schematic design; I am connecting modules as real user choices and feedback
-accumulate.
+This is not yet the stage where I would claim end-to-end automation of schematic design. Even a single module,
+however, already delivers time savings, and the system is designed around the full roadmap so the organization
+can gradually shift to an AI-based work environment. I am connecting modules in the order in which real user
+choices and feedback accumulate.

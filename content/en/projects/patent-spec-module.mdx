@@ -17,21 +17,22 @@ firm's internal patent-attorney evaluation criteria, its quality was only about 
 target. As the sole contractor responsible for the AI module, I handled the LangGraph pipeline
 design, prompts, exception handling, and containerization.
 
-## Turning a patent attorney's judgment into executable rules
+## Process
 
-Changing a single model or prompt could not reproduce the attorney's revision criteria
-consistently. I worked with the lead patent attorney to understand the drafting sequence,
-category-specific judgment criteria, and principles for correcting failure cases. I then
-formalized this tacit domain knowledge as generation rules and validation conditions, dividing the
-implementation between prompt engineering and LangGraph business logic.
+Changing a single model or prompt could not consistently reproduce the attorney's revision
+criteria or the style, word choice, and sentence structure that legal documents require. I worked
+with the lead patent attorney to understand the drafting sequence, category-specific judgment
+criteria, and principles for correcting failure cases. I then formalized this tacit domain
+knowledge as generation rules and validation conditions, dividing the implementation between
+prompt engineering and business logic.
 
-I separated the existing code into LangChain components so models and prompts could be swapped,
-and redesigned the generation, validation, and revision sequence as a LangGraph workflow. Input
-documents were parsed by section so that each step received only the context it needed. I also
-added a stage for processing patent drawings so that non-textual information would not be omitted
-from generation.
+I improved the existing code by separating it into LangChain components so models and prompts
+could be swapped, and redesigned the generation, validation, and revision sequence as a LangGraph
+workflow. Input documents were parsed by section so that each step received only the context it
+needed. I also added a stage within the pipeline for processing patent drawings so that
+non-textual information would not be omitted from generation.
 
-## Failure handling was harder than generation
+## Failure handling and retry logic
 
 A service that drafts legal documents cannot pass a truncated response or formatting error
 directly to a user. I therefore spent more effort specifying where and how the workflow should
@@ -48,7 +49,7 @@ integration with the other service components were outside my scope.
 ## Adopted into the service
 
 Quality under the firm's internal patent-attorney evaluation criteria increased from about 20–30%
-to 80–90%. Parallel processing reduced total processing time by about 20%. The containerized module
-I delivered was subsequently integrated into the live service. The pipeline covered not only
-successful generation but also explicit paths and retry conditions for interrupted output,
-invalid input, and failed review.
+to 80–90%. Parallel processing implemented inside the pipeline reduced total processing time by
+about 20%. The containerized module I delivered was subsequently integrated into the live service.
+For operational stability, the pipeline design included explicit paths and retry conditions for
+interrupted output, invalid input, and failed review.

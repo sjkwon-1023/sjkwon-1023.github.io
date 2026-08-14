@@ -19,7 +19,7 @@ content and frontmatter together, and Next.js generates the corresponding list a
 at build time. The key requirement was being able to revise content without also changing the UI
 code.
 
-## Designing for static deployment
+## GitHub Pages
 
 GitHub Pages does not run a Next.js server, but this site's content does not require SSR, ISR, or
 API routes. Rather than emulate server capabilities, the project uses `output: "export"` to
@@ -30,9 +30,9 @@ highlighter ships to the browser. A small inline script chooses the light or dar
 first render; CSS and a client-side toggle handle subsequent changes. This preserves static
 deployment while reducing theme flashes on initial load.
 
-## Keeping source and deployment in one flow
+## CI/CD
 
 A push to the `main` branch triggers GitHub Actions to run lint and `next build`. Only the
 generated `out/` directory is deployed to GitHub Pages, and build artifacts are not committed to
-the repository. It is a simple deployment flow in which the live site and public source point to
+the repository. I kept the deployment flow simple so that the live site and public source point to
 the same commit.

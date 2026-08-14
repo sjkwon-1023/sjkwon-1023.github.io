@@ -21,8 +21,8 @@ The canvas uses React Flow for drag-and-drop nodes, connections, and editable cu
 generation, the tool traces the node entering each conditional node, groups its outgoing targets, and emits that
 branch with `add_conditional_edges`; other connections become `add_edge` calls.
 
-I could have diagrammed the structure in n8n, but the required output was LangGraph code for the production service.
-Instead of installing and operating a workflow platform, I focused on moving directly from visual design to
-code. The tool serializes the nodes, edges, entry point, and graph name as JSON in the URL hash, allowing the same
+I could have diagrammed the structure in n8n, but the required output was LangGraph code I could paste straight
+into a Python project. Instead of installing and operating a workflow platform, I focused on designing the
+structure comfortably on screen and taking it straight to code. The tool serializes the nodes, edges, entry point, and graph name as JSON in the URL hash, allowing the same
 URL to reconstruct and share a design without a server or persistence layer. It is deployed on Netlify so it can
 be used without installation as needed.

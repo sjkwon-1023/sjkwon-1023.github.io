@@ -17,7 +17,7 @@ first meeting, we split the work into two approaches—LLM-based retrieval and e
 retrieval—then ran them in parallel and shared the findings. On the two-person team, I handled
 query and document rewriting experiments and embedding retrieval.
 
-## Two retrieval paths from the first meeting
+## Experiment direction
 
 The team's LLM-based path extracted keywords from each question, retrieved candidates with
 TF-IDF, and asked an LLM to choose the final three documents. It worked well for some questions,
@@ -35,7 +35,7 @@ For the embedding path, I compared six models.
 Upstage embedding-query/passage performed best, with a MAP of 0.8848. I used this score as the
 baseline for subsequent experiments that changed the text representation.
 
-## From query rewriting to document rewriting
+## Query and document rewriting
 
 After selecting the embedding model, I found that combining sparse and dense retrieval improved
 the score substantially over either method alone. Within hybrid retrieval, I compared the order
@@ -56,10 +56,10 @@ For the final submission, I combined candidates retrieved from the original ques
 documents, rewritten questions, and rewritten documents. Rather than replace the originals with a
 single transformed representation, I retained the different candidates each representation found.
 
-## The result after four days
+## Results
 
 The team was originally formed with four members, but two withdrew, leaving the two of us to
 run the actual competition. With only four days to test the LLM and embedding approaches in
 parallel, we did not train and apply a separate reranker. We began with an embedding-model
-comparison, but the decisive improvement came from adapting the representation of both questions
-and documents to retrieval and combining their results. We placed second overall.
+comparison, but the decisive improvement came from the rewriting logic that adapted the
+representation of questions and documents to retrieval. We placed second overall.

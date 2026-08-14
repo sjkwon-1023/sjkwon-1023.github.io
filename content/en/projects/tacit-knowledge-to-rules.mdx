@@ -10,11 +10,11 @@ featured: true
 order: 1
 ---
 
-A good English question for South Korea's College Scholastic Ability Test (CSAT) did not emerge
-from a single prompt. Review comments such as “the distractors are too easy” or “this feels
-AI-generated” contained criteria that experts applied implicitly, and developers often interpreted
-the same comment differently. The initial internal review pass rate for question types including
-grammar and vocabulary was under 10%.
+Before I joined, the initial internal review pass rate for generated questions was under 10%.
+After joining, I took ownership of the generation logic, pipelines, and prompt engineering to
+raise question quality, while also contributing to backend work for the service. I collaborated
+with content specialists to codify their tacit knowledge into logic, and worked with the team on
+the pipelines the service needed.
 
 ## From batch generation to a real-time service
 
@@ -23,20 +23,22 @@ loading questions. Depending on the question type, the system generated
 batches of 20,000–90,000 questions. The same generation modules also served real-time user
 requests. Cumulative LLM spending for batch generation was roughly KRW 20 million (about US$15,000).
 
-The team jointly built the Python and FastAPI microservices, Prefect batches, and dbt and
-PostgreSQL data flow. The backend used a layered architecture, with type-specific specifications
-supplied through dependency injection. I did not design the entire architecture alone: I
-contributed to several modules from the initial development phase, then focused primarily on
-type-specific LLM generation and validation logic and the iterative experiments around them.
+For the service pipeline, the team jointly built the Python and FastAPI microservices,
+Prefect-based orchestration, and the dbt and PostgreSQL data pipeline. The team's backend was
+designed with each module split into a layered architecture, with type-specific specifications
+supplied through dependency injection. In that environment, I contributed to backend module
+implementation from the initial development phase and worked on type-specific LLM generation and
+validation logic and prompt engineering.
 
 Some question types used ML models that had been trained before I joined. I helped serve those
 models and connect their outputs to the LLM pipeline.
 
-## Type-specific rules instead of one prompt
+## Generation logic
 
 More than ten question types—including topic, main idea, cloze, grammar, vocabulary, and paragraph
-ordering—followed different authoring processes and failed in different ways. I retraced each
-process with content specialists and organized their feedback into four categories.
+ordering—differed both in how experts authored them and in the criteria used to judge question
+quality. Working with content specialists, I codified each type's authoring process step by step
+and sorted the tacit knowledge into four categories.
 
 - Requirements that must always be satisfied
 - Expressions and structures that must not be used
@@ -51,12 +53,18 @@ experiment.
 
 ## A repeatable review loop
 
-Improving individual prompts was not enough to repeat experiments under consistent conditions. I
-connected generation, validation, and loading in Prefect pipelines so batch execution and
-comparison followed the same process each time. Human review was not a final step outside the
-automation; it was an input that updated the criteria for subsequent generation.
+If the way a run executed changed every time a prompt was modified, there would be no way to
+compare which changes actually worked. I fixed generation, validation, and loading into a Prefect
+pipeline so the same input always went through the same flow. That made it possible to see in
+numbers how the review pass rate shifted when a single rule or example changed.
 
-## Quality observed in production
+In this pipeline, human review was not a final gate outside the automation. When a specialist
+judged that “the distractors are too easy,” we examined that feedback together, unearthed the
+tacit knowledge hidden in it, and sorted it into the four rule categories. Those codified criteria
+went back into the prompts and logic and re-entered the pipeline, and quality rose as this loop
+accumulated.
+
+## Quality
 
 The initial internal review pass rate increased from under 10% to about 70%. Questions ultimately
 delivered through the system received no quality complaints over six months, and a content
@@ -64,7 +72,7 @@ specialist described some outputs as “better than those written by an average 
 writer.” These results did not come from one model alone. They came from connecting type-specific
 criteria, automated checks, and expert review through a shared vocabulary.
 
-## Improvements that grew out of this system
+## Related projects
 
 - [Improving Answer-Choice Combination for Korean CSAT English
   Questions](/en/projects/question-combination/): restored the valid

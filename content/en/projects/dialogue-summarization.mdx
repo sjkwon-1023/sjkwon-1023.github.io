@@ -17,7 +17,7 @@ fine-tuning. Because many reference summaries retained
 characteristics of translated prose, I focused the experiments on reproducing the evaluation set's style rather
 than simply generating the most natural Korean sentences.
 
-## How ROUGE shaped the experiments
+## Experiment direction
 
 ROUGE is sensitive to wording shared with the reference summary. I therefore used GPT-4o-mini to expand the
 training data fivefold, while also testing input-length changes and special tokens for speakers and turns with
@@ -26,6 +26,7 @@ reference-summary style on the actual score.
 
 ## Comparing summarization models and LLMs
 
+Within the team, training was split into two tracks: lightweight open-source NLP models and LLM fine-tuning.
 While fine-tuning KoBART- and KoGPT-family models, I compared augmentation volume, input token length, and special
 tokens that marked speakers and turns. Expanding the data fivefold with GPT-4o-mini produced only a small gain,
 and the special tokens had little effect. Adjusting input length helped slightly; `EbanLee/kobart-summary-v3`

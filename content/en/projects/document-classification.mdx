@@ -16,21 +16,21 @@ certificates, and vehicle registration certificates. The training set contained 
 medical opinion letters, and medical-payment certificates—also had similar layouts. On the four-person team, I
 was responsible for EDA, model training, and OCR experiments.
 
-## Why I started with OCR—and why I pivoted
+## Experiment direction
 
 The provided baseline used ResNet34 for image classification. Rather than start from that training path, I
 explored OCR-based classification from the outset because text within a document could identify its category more
 directly. The test images were noisier than expected, however, and reliable text extraction was not possible. I
 dropped the OCR-only approach and shifted the project to image classification.
 
-## Reproducing test-time transformations during training
+## Data augmentation
 
 I applied the blur and noise observed in the test set to training images and used Mixup, CutMix, and Augraphy. At
 inference time, I applied test-time augmentation (TTA) using shifts, rotations, and flips. The team compared
 ResNet34/50, EfficientNet B3–B7 and V2-XL, ConvNeXt, and ViT-Base, selecting ConvNeXt as the final model because it
 performed best.
 
-## Using OCR only when confidence was low
+## OCR ensemble
 
 Even after the shift to image classification, errors remained among documents with similar layouts. I combined
 the two approaches by sending only predictions with low ConvNeXt softmax confidence through an OCR-based
