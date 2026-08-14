@@ -30,7 +30,7 @@ the target. Cumulative LLM spending for the overall batch-generation process was
 KRW 20 million (about US$15,000), so generating the shortfall from scratch would have added both
 cost and another round of review.
 
-## Reframing the bug as a constraint problem
+## Problem definition
 
 Instead of generating more answer choices, I reframed the task as correctly combining choices that had
 already passed review. Every valid question had to satisfy all of the following constraints.
@@ -39,7 +39,7 @@ already passed review. Every valid question had to satisfy all of the following 
 - Once used, a choice may be reused no more than two additional times.
 - A combination containing the same three choices in the same order is not allowed to recur.
 
-## Two algorithms for different input sizes
+## Algorithm selection
 
 The first greedy approach I reviewed precomputed all candidate combinations, causing the search
 space to grow rapidly once the number of choices exceeded roughly 50. For larger inputs,
@@ -53,7 +53,7 @@ single passage was useful in practice, I applied integer programming below 50 ch
 randomized greedy at 50 or more. I connected the combination rules and deduplication to the dbt
 and SQL transformations so they could run repeatedly within the existing data flow.
 
-## Restoring the reduced question pool
+## Results
 
 Without generating any new answer choices, the system recovered about 90,000 valid questions. This was
 not net growth from 40,000; it restored output to approximately the pre-bug level. The LLM

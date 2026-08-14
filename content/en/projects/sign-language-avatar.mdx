@@ -10,19 +10,19 @@ featured: false
 order: 1
 ---
 
-The team began with the idea of having a 3D avatar express spoken or written Korean in Korean Sign
+The starting point was the idea of having a 3D avatar express spoken Korean in Korean Sign
 Language (KSL). The task was not initially defined as a translation problem. After analyzing AI
-Hub data and the structures of Korean and sign-language morphemes, I defined the
-Korean-to-sign-morpheme stage as a translation task and proposed starting with the BART family.
+Hub data and the structures of Korean and sign-language morphemes, we concluded that rather than
+translating Korean directly into sign-language coordinates, it was better to translate into the
+KSL morphemes defined in the dataset and then map those morphemes to coordinates.
 
-Our available environment was a Windows PC with 8 GB of VRAM. On the three-person team, I handled
-EDA and translation-model fine-tuning. Later, I used Blender to diagnose the cause of errors in
-the Unity animation.
+On the three-person team, I handled EDA and translation-model fine-tuning. Later, I used Blender
+to diagnose the cause of errors in the Unity animation.
 
-## Defining the problem as translation and choosing BART
+## Model selection
 
 The target output was not a free-form Korean sentence but a short sequence of sign-language
-morphemes. Given the 8 GB VRAM constraint and roughly 130,000 training examples, we chose the
+morphemes. Given the 8 GB local VRAM constraint and roughly 130,000 training examples, we chose the
 encoder-decoder architecture of koBART base over a larger generative model. Rather than begin with
 a model already fine-tuned for summarization or translation, I judged it better to teach the base
 model the sign-language output format directly from our data.
@@ -39,8 +39,9 @@ it. I selected and fine-tuned `hyunwoongko/kobart`, whose output was stable unde
 configuration. During these experiments, extending the input and output lengths to accommodate a
 small number of long samples worsened validation loss, so I kept the maximum length at 128.
 
-In a ten-epoch run, validation loss began rising again after roughly the fifth epoch. I therefore
-fixed later experiments at five epochs and saved the checkpoint with the lowest validation loss.
+In a ten-epoch run, validation loss began rising again after roughly the fifth epoch. Judging
+this to be overfitting, I fixed later experiments at five epochs and saved the checkpoint with the
+lowest validation loss.
 
 ![Training and validation loss curves for hyunwoongko/kobart](/media/sign-language/training-loss.png)
 
@@ -50,7 +51,7 @@ morpheme-specific vocabulary and retraining the tokenizer, I constrained decodin
 could generate only token sequences corresponding to morphemes found in the dataset while
 preserving the meaning carried by Korean subword units the tokenizer already knew.
 
-## Finding why the coordinates broke
+## Debugging
 
 For each translated morpheme, we looked up the corresponding facial, pose, and both-hand
 coordinates in the source JSON and converted them into frame sequences. The image below shows the
@@ -71,8 +72,8 @@ correctly. This is the failed animation produced when the rig and coordinate dat
   <source src="/media/sign-language/rig-mismatch.mp4" type="video/mp4" />
 </video>
 
-After completing the translation-model work, I joined the investigation. I first used Blender
-Python to visualize the frame-by-frame coordinates for the translated sign morphemes as points,
+After completing the translation-model work, I joined the investigation. I first used Blender to
+visualize the frame-by-frame coordinates for the translated sign morphemes as points,
 checking whether the morpheme-to-coordinate stage worked correctly.
 
 <video
@@ -103,7 +104,7 @@ reproduction steps and root cause in a bug report. The teammate responsible for 
 that diagnosis to switch to another rigged model compatible with the coordinate structure and
 complete the final character animation.
 
-## What we implemented—and what remains unvalidated
+## Results
 
 After changing the model and constraining its output, the system produced examples like the
 following. Because the model operates on Korean, the original input and morpheme output are
@@ -128,7 +129,4 @@ compatible rigged model.
 </video>
 
 The team implemented the full flow from text to sign-language morphemes, 3D coordinates, and
-avatar motion. My contributions were the translation model and Blender-based error diagnosis. We
-did not design quantitative metrics for comparing translation quality across models, however, so
-this should be understood as an implementation of the end-to-end pipeline rather than a validated
-translation-quality result.
+avatar motion. My contributions were the translation model and Blender-based error diagnosis.

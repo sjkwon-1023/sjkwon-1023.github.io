@@ -10,11 +10,12 @@ featured: false
 order: 1
 ---
 
-## Question: Does learning from easy examples first make training faster?
+## Question: What if an LLM learned from easy to hard, the way humans do?
 
-When pretraining a Korean language model from scratch, does presenting the same data from easy to difficult help
-the model learn faster than random shuffling? Because ordering can be changed without changing either the dataset
-or model size, it was worth isolating its effect. I trained a 110M-parameter model on a single pass over 2.5
+When pretraining a Korean language model from scratch, would presenting the same data from easy to difficult—the
+way humans learn—help the model learn faster than random shuffling? I designed and ran this personal experiment
+around that question. Because ordering can be changed without changing either the dataset or model size, it was
+worth isolating its effect. I trained a 110M-parameter model on a single pass over 2.5
 billion tokens and compared a random baseline with three curriculum conditions.
 
 The four orders were:
@@ -29,7 +30,7 @@ difficult 10% of tokens with easier data, so it includes a data-selection effect
 treated it as a separate condition from the outset to avoid interpreting that difference as a pure ordering
 effect. All four conditions used exactly 2.5 billion training tokens.
 
-## Holding everything constant except order
+## Controlling everything except order
 
 The model is a 110M-parameter decoder-only Transformer. It uses Llama-family RMSNorm, RoPE, and SwiGLU; I
 implemented both the model and training loop directly in PyTorch. The tokenizer is a 32k byte-level BPE trained
@@ -63,7 +64,7 @@ first. I therefore prioritized four fixed-learning-rate runs with the same seed 
 repeating seeds, comparing eight runs in total:
 four cosine-schedule runs and four fixed-rate runs.
 
-## Making the experiment reproducible
+## Reproducible experiment design
 
 I separated data collection, preprocessing, tokenizer training, tokenization, difficulty scoring, order
 generation, training, and evaluation into the staged CLI
@@ -85,7 +86,7 @@ the Transformers GPT-2 wrapper split Korean tokenizer input at the byte level. I
 and loaded the raw `tokenizers.Tokenizer` instead. Producing a number and measuring the intended quantity are not
 the same thing.
 
-## Results opposite to the hypothesis
+## Results
 
 | Condition | Final val loss | Tokens to target loss (3.645) | Final bits per character (BPC) |
 | --- | --- | --- | --- |
@@ -108,7 +109,7 @@ training.
 
 ![Validation loss by difficulty band](/figures/ko-curriculum/val_loss_bands.png)
 
-## Testing whether the learning rate caused the result
+## Fixed-learning-rate reruns
 
 Under a cosine schedule, difficult data always appears in the low-learning-rate portion of training. Before
 calling the initial result an ordering effect, I needed to examine this confound. I therefore retrained all four
@@ -122,7 +123,7 @@ explanation.
 
 ![Fixed-learning-rate reruns](/figures/ko-curriculum/lr_ablation.png)
 
-## Does the pattern hold beyond loss?
+## Benchmarks
 
 I shuffled outputs for 20 fixed prompts without revealing condition names and asked two LLM judges to compare
 them. Among cases where both judges chose the same winner, `random` beat `difficulty` 12–2; a two-sided binomial
@@ -196,40 +197,47 @@ sentiment, data specialization can partly compensate for a smaller parameter cou
 reasoning capacity**. Because the models also differ in training-data volume and tuning method, this is not a
 causal estimate of the effect of Korean-only pretraining.
 
+### Human-designed difficulty may not transfer to LLMs
+
+[Beyond Random Sampling: Efficient Language Model Pretraining via Curriculum
+Learning](https://arxiv.org/abs/2506.11300) (Zhang et al., 2025) reported faster early training for larger
+English models across several curriculum settings. The experiments are not directly comparable—model scale,
+language, data, difficulty metric, and training method all differ—but I likewise expected an easy-first order to
+beat random training here, or at least match it. Instead, `random` led every curriculum condition, the opposite
+of that expectation.
+
+The per-band losses in this experiment show that even the random model ranked hard below mid. The metric intends
+the difficulty order easy < mid < hard, but a linguistic difficulty measure designed by humans cannot be assumed
+to mean the same difficulty to an LLM. Curriculum learning rests on the assumption that a model, like a human,
+learns from easy examples first; if the very standard of easy and hard diverges between humans and LLMs, a
+human-designed curriculum ends up forcing an inefficient order.
+
 ## Questions for the next experiment
 
 ### Does repetition eliminate forgetting?
 
 If forgetting caused the result, the next experiment makes a clear prediction. Keeping the total token count
-fixed, I could reduce the corpus to one quarter and train for four epochs, comparing reshuffling each epoch,
-repetition of the full curriculum cycle (spaced), and repetition of difficulty-band blocks (blocked). Under the
-cyclical schedule, which revisits the easy band periodically, the increase in easy loss observed here should
-disappear. This would also compare blocked and interleaved practice from cognitive science in the setting of
-language-model pretraining.
+fixed, I would like to reduce the corpus to one quarter and train for four epochs, comparing reshuffling each
+epoch, repetition of the full curriculum cycle (spaced), and repetition of difficulty-band blocks (blocked). I
+expect the increase in easy loss observed here to disappear under the cyclical schedule, which revisits the easy
+band periodically. It would also be meaningful as a comparison of blocked and interleaved practice from
+cognitive science in the setting of language-model pretraining.
 
 ### Does the advantage of specialization generalize to other domains?
 
-The anchor comparison suggests a hypothesis: a small specialized model can outperform a larger general model on
-**distribution-fit** tasks, but cannot replace the minimum model capacity required for **reasoning tasks**. For a
-small code-specific model, this predicts efficiency on syntax and autocomplete but
-a minimum capacity of about 1B parameters for algorithmic problem solving. The same structure could be tested in
-vision by pairing a small captioner with a text LLM and asking whether the caption's information bottleneck sets
-an upper bound on final performance.
+That a 110M model trained only on Korean performed comparably to much larger open-weight models suggests that
+data specialization can partly offset differences in parameter count. I would like to see whether this result
+reproduces in other domains.
 
-## What this experiment cannot yet establish
+For example, how far could a small model trained only on code compete with large general-purpose models on code
+syntax and autocomplete? Another interesting question is how close a small model specialized purely in image
+captioning, paired with a text LLM without a vision encoder such as DeepSeek V4, could come to a dedicated VLM
+in image understanding.
 
-- **There was only one seed.** Paired comparisons with identical initial weights and the same ordering across two
-  learning-rate settings provide supporting evidence, but I did not estimate variance between conditions. These
-  results therefore support a mechanism within this setup, not a general conclusion about curriculum learning.
-- **`mixed` combines data-selection and ordering effects.** Its preview ratio is also based on chunk counts rather
-  than tokens, so differences in chunk length across bands can change the actual token ratio.
-- **Generation was evaluated by LLM judges.** The evaluation compared 20 prompts at one final checkpoint, and the
-  only statistically significant matchup was `random` versus `difficulty`.
-- **Some Ko-MinPair categories differ in length.** For 80 pairs covering an instrumental/directional
-  particle, conjugation, and honorifics, the good and bad sentences differ by roughly one character.
-  This can introduce a directional bias in summed log probabilities, so I interpreted those categories
-  separately.
-- **Web-corpus deduplication used exact-match hashes only.** Near-duplicates may remain.
-- **The external models are reference points.** Their training-data volumes differ by tens to thousands of times;
-  EXAONE is instruction-tuned and Gemma uses a multilingual 262k vocabulary, so this is not a comparison that
-  controls everything except parameter count.
+### Difficulty as the LLM sees it
+
+If human-designed linguistic difficulty metrics do not fit LLMs, the natural next step is to measure difficulty
+as the LLM itself experiences it. Computing per-sample loss or forgetting scores on the same corpus and
+comparing them with the human-designed metric would be a starting point for defining what counts as easy data
+for an LLM. Only with a curriculum redesigned on that basis could the question—does an LLM, like a human, learn
+faster from easy examples first?—finally be answered.

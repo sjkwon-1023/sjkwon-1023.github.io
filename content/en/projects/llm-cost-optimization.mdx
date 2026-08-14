@@ -11,27 +11,26 @@ order: 2
 ---
 
 The first problem I set out to solve was evaluation consistency, not cost. When a generative LLM serves as the
-judge, its response format and decision can vary even under the same criteria. Large batches therefore needed a
+judge, its response format and decision sometimes vary even under the same criteria. Large batches therefore needed a
 repeatable method of automated evaluation.
 
-Cost still mattered. LLM spending on batch generation of English questions had reached roughly KRW 20 million
-(about US$15,000), and post-generation validation with a high-end model cost roughly KRW 50 (US$0.04) and took
-30 seconds per item. This PoC, however, targeted the per-item validation cost—not the entire accumulated
-generation cost.
+Cost still mattered. LLM spending on batch generation of English questions, including evaluation, had reached
+roughly KRW 20 million (about US$15,000), and the validation stage called a high-end model at roughly KRW 50
+(US$0.04) and 30 seconds per item.
 
-## A lower-cost commercial model instead of a local small language model
+## Model selection
 
 Reliable access to local GPU resources was difficult at the time, so I excluded self-hosting a small language
 model (SLM). Instead, I
-considered lower-cost commercial API models that could be compared directly within the existing pipeline. The
-cost figures below are estimates calculated from the sample's input and output token usage and the API pricing at
-the time, not production invoices.
+considered lower-cost commercial API models that could be compared directly within the existing pipeline. Costs
+were calculated by directly tallying input and output token usage across roughly 100 real sample items and
+applying the API pricing at the time.
 
-## Changing the decision method before changing the model
+## Approach
 
-Simply asking a lower-cost model for the same free-form evaluation would not make it easy to compare both cost
-and decision stability. Instead of having the validation model generate an explanation, I built logic that
-compared the log probabilities of candidate labels. The task needed a pass/fail decision, not a long answer.
+Having the lower-cost model run the same free-form evaluation made evaluation stability even worse. So instead
+of deciding from the scores and explanations the validation model produced, I built logic that compared the log
+probabilities of candidate labels. The task needed an accurate pass/fail decision, not a long answer.
 
 I compared the lower-cost commercial model's decisions with those of the existing high-end model, examining
 cost, processing time, agreement, and reproducibility across repeated runs. To hold conditions constant, I reran
@@ -41,17 +40,17 @@ the experiment within the Prefect-based generation, validation, and loading pipe
 
 | | Existing judge | PoC candidate |
 | --- | --- | --- |
-| Estimated token cost per item | Approx. KRW 50 (US$0.04) | Approx. KRW 5 (US$0.004; −90%) |
+| Token cost per item | Approx. KRW 50 (US$0.04) | Approx. KRW 5 (US$0.004; −90%) |
 | Processing time per item | Approx. 30 sec | Approx. 15 sec (−50%) |
 
-Within the PoC sample, every decision matched the existing high-end model. This was agreement with the incumbent
-model, not accuracy measured against human-annotated ground truth. Within that scope, the experiment showed the
-potential to separate validation into a cheaper model and a shorter classification task.
+In the PoC, run on roughly 100 real sample items, the candidate model's decisions all matched those of the
+existing high-end model. This is not accuracy measured against human-annotated ground truth, but within this
+sample it confirmed the potential to separate validation into a cheaper model and a shorter classification task.
 
-## What the PoC did not establish
+## Confirmed potential and expansion directions
 
-Although every decision matched within the sample, this alone does not show that quality would hold across other
-item types or larger batches. The project schedule did not allow expansion to type-stratified samples or
-validation under production conditions, so the approach was not deployed in the live pipeline. This result is
-therefore not a realized cost saving; it is a PoC that suggested a lower-cost commercial model might be viable
-and narrowed the scope of the next validation study.
+This PoC confirmed that, rather than entrusting every evaluation to a high-end judge's free-form responses,
+separating it into short label classification by a lower-cost model can cut cost and processing time while
+maintaining agreement with the existing decisions. It also let me select the candidate model and classification
+method to adopt, and pin down the validation scope that a production rollout would need to confirm with
+type-stratified samples and expert-annotated ground-truth labels.
