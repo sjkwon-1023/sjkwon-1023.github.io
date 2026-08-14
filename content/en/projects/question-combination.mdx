@@ -13,21 +13,18 @@ order: 3
 This work was part of the [English Question Generation and Validation System for South Korea's
 College Scholastic Ability Test
 (CSAT)](/en/projects/tacit-knowledge-to-rules/), which generated batches of 20,000–90,000 questions
-depending on the type and reused the same generation logic in a real-time service. The
-team built the overall system together. I contributed from the initial development phase to
-type-specific generation and validation logic and parts of the data pipeline. This page focuses
-on my work correcting the answer-choice combination logic.
+depending on the type and reused the same generation logic in a real-time service.
 
 The existing system combined pre-generated correct answers and distractors for each passage to
-produce multiple questions without duplicates. While reviewing the logic, however, I found a bug
+produce multiple questions without duplicates. While inspecting the generated questions, however, I found a bug
 that reused the same combination of correct answers and distractors across multiple questions. The
 second question, for example, was supposed to draw a new mix of answer choices but instead reused
 the same five from the first question and changed only whether the prompt asked learners to identify
 the correct or incorrect option.
 
 As a result, the valid question pool fell to roughly half its previous size—about 40,000—far below
-the target. Cumulative LLM spending for the overall batch-generation process was already roughly
-KRW 20 million (about US$15,000), so generating the shortfall from scratch would have added both
+the target. Cumulative LLM spending for the overall batch-generation process was already in the
+tens of millions of won, so generating the shortfall from scratch would have added both
 cost and another round of review.
 
 ## Problem definition
@@ -42,16 +39,16 @@ already passed review. Every valid question had to satisfy all of the following 
 ## Algorithm selection
 
 The first greedy approach I reviewed precomputed all candidate combinations, causing the search
-space to grow rapidly once the number of choices exceeded roughly 50. For larger inputs,
+space to grow rapidly once the number of choices per passage passed a certain level. For larger inputs,
 randomized greedy became an alternative that could find a valid solution quickly without
 guaranteeing the optimal combination. Separately, I formulated the problem as integer programming
 and found that, at manageable input sizes, it could produce an optimal solution satisfying every
 constraint within practical runtime.
 
-After confirming with the content team whether producing a large number of questions from a
-single passage was useful in practice, I applied integer programming below 50 choices and
-randomized greedy at 50 or more. I connected the combination rules and deduplication to the dbt
-and SQL transformations so they could run repeatedly within the existing data flow.
+After confirming with the content team that producing more than a certain number of questions
+from a single passage was not appropriate, I applied integer programming below 50 choices and
+randomized greedy above that. I connected the combination rules and deduplication to the
+question-generation pipeline so they could run repeatedly within the existing data flow.
 
 ## Results
 

@@ -12,14 +12,14 @@ order: 1
 
 We needed to condense patent-dispute response consulting reports averaging roughly 200 pages into one or two
 pages that a nonspecialist could understand. Document length was only part of the problem: the 20 samples ranged
-from 20 to more than 600 pages, used different patent-firm templates, and mixed Korean with English, Japanese,
-and Chinese.
+from 20 to more than 600 pages, used different patent-firm templates, and mixed English, Japanese, and
+Chinese.
 
 ## Overcoming the context length limit
 
 Under the company's requirements, we could not use a separate GPU instance, and the reports came from a
-public-sector intellectual-property support program, so we had to use a Naver API covered by an
-intermediate-level or higher Cloud Security Assurance Program (CSAP) certification. Open-source models were
+Korea Institute of Patent Information (KIPI) support program, so we had to use a Naver API covered by an
+intermediate-level or higher public-sector Cloud Security Assurance Program (CSAP) certification. Open-source models were
 therefore not an option, and we used HyperCLOVA X, which met the requirements at the time.
 
 HyperCLOVA X's maximum context was then 8,192 tokens, while the source reports averaged more than 100,000
