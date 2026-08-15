@@ -13,16 +13,57 @@ generation and validation through storage and user selection.
 I do not choose the technology first. I first ask how often the problem recurs, what impact a
 solution could have, and how much validation will cost.
 
-## Current role
+## Experience
 
-I am the first dedicated digital and AI transformation (DX/AX) engineer—and the only in-house
-developer—at an architectural design firm of about 100 people. I plan, build, and operate
-everything from collaboration, data, and cloud foundations to architecture-specific AI products
-and human-in-the-loop workflows.
+### aa-architecture · Head of AI Lab / DX·AX Lead
+*Jun 2026 – Present (Full-time)*
 
-My process analysis showed that proposal-stage schematic design consumed the most staff time. I defined
-this two-to-three-week process as a modular pipeline: `site analysis → site planning → modeling →
-architectural visualization → presentation materials`. I am building it one component at a time.
-The components currently in development include an agent that assists architectural visualization
-and a SketchUp MCP-based modeling automation tool. Each is designed to become part of one connected
-workflow rather than remain a standalone feature.
+As the sole in-house developer and first DX/AX lead at an architectural firm of ~100 staff, I oversee the technical roadmap, product engineering, cloud infrastructure, and company-wide adoption.
+
+- Driving a modular human-in-the-loop schematic design automation pipeline: `site planning → modeling → visualization → presentation`
+- Developed beta tools for map-based building ledger lookup and DXF/SketchUp MCP modeling automation
+- Built an image generation and LLM/VLM evaluation assistant agent, capturing user feedback (selection, regeneration, ratings) for iterative improvement
+- Built GCP infrastructure (Cloud Run, Cloud SQL, GCS, Secret Manager) with Terraform and automated keyless CI/CD using GitHub Actions & WIF/OIDC
+- Led Microsoft 365 deployment with a 15% negotiated cost reduction; established structured data accumulation for future internal RAG systems
+- [View Project Details →](/en/projects/architecture-ax/)
+
+### Bookips · AI Engineer
+*Jun 2025 – May 2026 (Full-time)*
+
+Designed generation and validation logic for CSAT English question pipelines, focusing on cost and quality optimization.
+
+- Structured expert tacit knowledge into LLMs and deterministic business logic, raising initial internal review pass rate from under 10% to ~70%
+- Maintained 0 quality complaints over 6 months and improved answer generation PoC accuracy from 91.21% to 96.45%
+- Expanded the valid question pool from ~40k to 90k using integer programming and greedy algorithms without additional LLM generation costs
+- Validated low-cost models via Log Probability: achieved 100% agreement with baseline while reducing verification cost by 90% (KRW 50 → 5) and latency by 50% (30s → 15s)
+- [Question Generation & Validation →](/en/projects/tacit-knowledge-to-rules/) · [Answer-Choice Optimization →](/en/projects/question-combination/) · [Cost Optimization PoC →](/en/projects/llm-cost-optimization/)
+
+### Drift Patent · AI Engineer
+*Feb 2025 – Mar 2025 (Contract)*
+
+Solely developed the production patent specification drafting pipeline for an IP tech startup.
+
+- Implemented a LangGraph multi-agent generation-validation-revision workflow with patent drawing image input
+- Built robust error handling (token cutoffs, prompt injection defense, auto-revision) and delivered production Docker containers
+- Improved quality score against patent attorney review criteria from 20–30% to 80–90%
+- [View Project Details →](/en/projects/patent-spec-module/)
+
+## Education
+
+### Fastcampus Upstage AI LAB
+*Jul 2024 – Feb 2025*
+
+AI Engineering Intensive Program (Machine Learning · NLP · RAG · MLOps)
+- 2x 1st Place, 1x 2nd Place across 4 competitions (e.g. 2nd place in RAG Document Retrieval: [View Project](/en/projects/rag-document-retrieval/))
+
+### Queen’s University Belfast
+*Sep 2015 – Jun 2019*
+
+BSc Architecture (Belfast, Northern Ireland, UK)
+
+## Skills
+
+- **AI / LLM**: LangGraph · LangChain · RAG · Prompt Engineering · LLM/VLM Evaluation & Serving · Log Probability Validation
+- **Backend / Data**: Python · FastAPI · PostgreSQL · SQL · Prefect · dbt · Docker · MLOps · Batch Pipelines
+- **Cloud / Infra**: GCP (Cloud Run · Cloud SQL · GCS · Secret Manager) · Terraform · GitHub Actions (WIF/OIDC Keyless CI/CD)
+- **Domain**: DXF · SketchUp MCP Modeling Automation

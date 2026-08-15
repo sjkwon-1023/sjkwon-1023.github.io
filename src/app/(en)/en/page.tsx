@@ -24,7 +24,7 @@ export default function EnHomePage() {
   return (
     <main lang="en" className="mx-auto max-w-(--container-shell) px-6 md:px-8">
       <section className="py-16 md:py-24">
-        <p className="font-mono text-sm text-fg-muted">Applied AI · Product Engineer</p>
+        <p className="font-mono text-sm text-fg-muted">Applied AI · AX Product Engineer</p>
         <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight">{HEADLINE}</h1>
         <p className="mt-5 max-w-2xl text-fg-muted">
           I identify high-impact problems in recurring real-world work, then translate expert

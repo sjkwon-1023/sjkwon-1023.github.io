@@ -11,14 +11,57 @@
 기술을 먼저 정하지는 않습니다. 문제가 얼마나 반복되는지, 기대 효과가 어느 정도인지, 검증에
 얼마가 드는지를 먼저 봅니다.
 
-## 지금
+## 경력
 
-약 100명 규모 건축설계 조직의 첫 DX·AX 전담자이자 사내 유일 개발자로 일하고 있습니다.
-협업·데이터·클라우드 기반부터 건축 특화 AI 제품과 Human-in-the-loop 업무 워크플로까지
-기획·개발·운영을 맡고 있습니다.
+### aa-architecture · AI연구소 팀장
+*2026년 6월 – 현재 (정규직)*
 
-업무를 분석해 보니 인력이 가장 많이 들어가는 구간이 수주 전 계획설계였습니다. 이 2–3주짜리
-흐름을 '대상지 → 배치계획 → 모델링 → 조감도 → 설명회 자료'의 모듈형 파이프라인으로 정의하고
-조각부터 만들고 있습니다. 조감도 생성 보조 에이전트와 SketchUp MCP 기반 모델링 자동화가
-지금까지 나온 것들입니다. 개별 기능으로 끝내지 않고 나중에 하나의 워크플로로 이어지도록
-설계합니다.
+약 100명 규모 건축설계 조직의 첫 DX·AX 전담자이자 사내 유일 개발자로서 기술 로드맵, 제품 개발, 클라우드 인프라 구축과 현업 도입을 총괄하고 있습니다.
+
+- 배치계획–모델링–이미지 생성–PPT 작성을 연결하는 모듈형 Human-in-the-loop 계획설계 자동화 로드맵 추진
+- 지도 기반 건축물대장 조회와 DXF·SketchUp MCP 기반 모델링 자동화 도구 베타 개발
+- 이미지 생성·LLM/VLM 1차 평가·사람의 최종 검토를 연결한 보조 에이전트 개발 및 사용자 피드백(선택률·재생성률·평가) 데이터셋 파이프라인 구축
+- Terraform 기반 GCP(Cloud Run, Cloud SQL, GCS, Secret Manager) 환경 및 GitHub Actions WIF/OIDC 키리스 CI/CD 구축
+- Microsoft 365·Teams·Outlook 도입 및 비용 약 15% 절감 조건 확보, 사내 데이터 자산화 및 향후 RAG 연동 기반 설계
+- [프로젝트 상세 보기 →](/projects/architecture-ax/)
+
+### Bookips · AI Engineer
+*2025년 6월 – 2026년 5월 (정규직)*
+
+수능 영어문항 제작 및 검증 파이프라인의 생성·검증 로직 설계와 비용·품질 최적화를 담당했습니다.
+
+- 전문가의 암묵지를 LLM 프롬프트와 결정론적 비즈니스 로직으로 구조화해 내부 최초 검수 합격률을 10% 미만에서 약 70%로 개선
+- 6개월간 최종 제공 문항 관련 품질 컴플레인 0건 유지 및 정답 생성 PoC 정확도 91.21% → 96.45% 달성
+- 탐욕 알고리즘·정수계획법 기반의 선택지 조합 시스템을 개발해 추가 생성 비용 없이 유효 문항 풀을 약 4만 개에서 9만 개로 확대
+- Log Probability 검증 PoC를 통해 기존 대비 100% 평가 일치도를 유지하며 문항당 검증 비용을 약 50원에서 5원으로, 지연시간을 30초에서 15초로 단축
+- [문항 생성·검증 시스템 →](/projects/tacit-knowledge-to-rules/) · [선택지 조합 최적화 →](/projects/question-combination/) · [비용 최적화 PoC →](/projects/llm-cost-optimization/)
+
+### Drift Patent · AI Engineer
+*2025년 2월 – 2025년 3월 (프로젝트 계약)*
+
+실제 서비스에 탑재되는 특허명세서 자동 작성 AI 모듈을 단독 개발했습니다.
+
+- LangGraph 기반 생성–검증–수정 멀티에이전트 파이프라인 및 특허 도면 이미지 입력 흐름 구현
+- 토큰 제한 대응 및 오류 자동 재시도 등 예외 처리 경로를 포함한 Docker 컨테이너 패키징 및 서비스 전달
+- 프로젝트 내부 변리사 평가 기준 품질을 약 20–30%에서 80–90% 수준으로 대폭 개선
+- [프로젝트 상세 보기 →](/projects/patent-spec-module/)
+
+## 교육
+
+### Fastcampus Upstage AI LAB
+*2024년 7월 – 2025년 2월*
+
+AI Engineering Intensive Program (Machine Learning · NLP · RAG · MLOps)
+- 4개 경진대회 중 1위 2회, 2위 1회 달성 (RAG 검색 경진대회 2인 팀 2위: [프로젝트 보기](/projects/rag-document-retrieval/))
+
+### Queen’s University Belfast
+*2015년 9월 – 2019년 6월*
+
+BSc Architecture (영국 북아일랜드 벨파스트)
+
+## 기술
+
+- **AI / LLM**: LangGraph · LangChain · RAG · Prompt Engineering · LLM/VLM 평가 및 서빙 · Log Probability 검증
+- **Backend / Data**: Python · FastAPI · PostgreSQL · SQL · Prefect · dbt · Docker · MLOps · 배치 파이프라인
+- **Cloud / Infra**: GCP (Cloud Run · Cloud SQL · GCS · Secret Manager) · Terraform · GitHub Actions (WIF/OIDC 키리스 CI/CD)
+- **Domain**: DXF · SketchUp MCP 모델링 자동화
