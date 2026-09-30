@@ -1,10 +1,10 @@
 ---
 title: "CSAT English Question Generation and Validation System"
 description: "Systematized type-specific generation and validation criteria, raising the initial internal review pass rate from under 10% to about 70%."
-period: "Jun 2025 – May 2026 (during my tenure)"
+period: "Jun 2025 - May 2026 (during my tenure)"
 sortDate: "2025-06-01"
 tags: ["Professional Work", "Production"]
-role: "BookIPs · AI Engineer — Designed type-specific generation and validation logic and led iterative experiments"
+role: "BookIPs · AI Engineer, designed type-specific generation and validation logic and led iterative experiments"
 stack: ["Python", "FastAPI", "PostgreSQL", "Prefect", "dbt", "GCP", "LLM API", "ML Serving"]
 featured: true
 order: 1
@@ -18,9 +18,8 @@ the pipelines the service needed.
 
 ## From batch generation to a real-time service
 
-This was not an experimental notebook, but a production pipeline for generating, validating, and
-loading questions. Depending on the question type, the system generated
-batches of 20,000–90,000 questions. The same generation modules also served real-time user
+This was the production pipeline for generating, validating, and loading questions. Depending on the question type, the system generated
+batches of 20,000-90,000 questions. The same generation modules also served real-time user
 requests. Cumulative LLM spending for batch generation ran into the tens of millions of won.
 
 For the service pipeline, the team jointly built the Python and FastAPI microservices,
@@ -35,8 +34,8 @@ models and connecting their outputs to the LLM pipeline.
 
 ## Generation logic
 
-More than ten question types—including topic, main idea, cloze, grammar, vocabulary, and paragraph
-ordering—differed both in how experts authored them and in the criteria used to judge question
+More than ten question types, including topic, main idea, cloze, grammar, vocabulary, and paragraph
+ordering, differed both in how experts authored them and in the criteria used to judge question
 quality. Working with content specialists, I codified each type's authoring process step by step
 and sorted the tacit knowledge into four categories.
 
@@ -58,8 +57,8 @@ compare which changes actually worked. I fixed generation, validation, and loadi
 pipeline so the same input always went through the same flow. That made it possible to see in
 numbers how the review pass rate shifted when a single rule or example changed.
 
-In this pipeline, human review was not a final gate outside the automation. When a specialist
-judged that “the distractors are too easy,” we examined that feedback together, unearthed the
+Expert review results also went back into the pipeline. When a specialist
+judged that "the distractors are too easy," we examined that feedback together, unearthed the
 tacit knowledge hidden in it, and sorted it into the four rule categories. Those codified criteria
 went back into the prompts and logic and re-entered the pipeline, and quality rose as this loop
 accumulated.
@@ -69,9 +68,7 @@ accumulated.
 For raw output before the validation logic ran, the expert review pass rate rose from under 10%
 to about 70%. In an answer generation PoC, optimizing prompts and post-processing logic improved
 accuracy from 91.21% to 96.45%. The questions ultimately delivered after validation maintained
-zero quality complaints over six months. These numbers came less from any single model's performance
-than from connecting the type-specific generation logic, the evaluation pipeline, and the experts'
-item-writing logic.
+zero quality complaints over six months.
 
 ## Related projects
 

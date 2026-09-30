@@ -1,7 +1,7 @@
 ---
 title: "Korean Text-to-Korean Sign Language 3D Avatar"
 description: "Built a model that translates Korean sentences into Korean Sign Language morphemes and diagnosed failures in the 3D avatar integration."
-period: "Mar 2025 – Apr 2025"
+period: "Mar 2025 - Apr 2025"
 sortDate: "2025-03-19"
 tags: ["Personal Project"]
 role: "3-person team · EDA, translation-model fine-tuning, and Blender-based error diagnosis"
@@ -29,9 +29,7 @@ model the sign-language output format directly from our data.
 
 Most of the original data consisted of sentences describing disaster scenarios. We used the
 sign-language morphemes to prompt an LLM to generate everyday Korean sentences, expanding the
-training set to roughly 130,000 examples, although the generated sentences were repetitive. We
-also considered using a separate Korean everyday-conversation dataset as input, but excluded it
-because of storage constraints.
+training set to roughly 130,000 examples.
 
 I tested `gogamza/kobart-base-v2` and `hyunwoongko/kobart`. Because
 `gogamza/kobart-base-v2` continued to repeat the same output across parameter changes, I excluded
@@ -45,8 +43,8 @@ lowest validation loss.
 
 ![Training and validation loss curves for hyunwoongko/kobart](/media/sign-language/training-loss.png)
 
-Another issue was that sign-language morphemes combining Korean characters and numbers, such as
-`먼지1#`, did not map one-to-one to existing tokenizer tokens. Instead of adding a
+Sign-language morphemes combining Korean characters and numbers, such as `먼지1#`, did not map
+one-to-one to existing tokenizer tokens. Instead of adding a
 morpheme-specific vocabulary and retraining the tokenizer, I constrained decoding so the model
 could generate only token sequences corresponding to morphemes found in the dataset while
 preserving the meaning carried by Korean subword units the tokenizer already knew.
@@ -111,8 +109,8 @@ following. Because the model operates on Korean, the original input and morpheme
 preserved alongside an English gloss.
 
 > Korean input: `내일 오후 미세먼지 주의보가 발령되었으니 외부활동을 삼가해 주시기 바랍니다`
-> English gloss: “A fine-dust advisory has been issued for tomorrow afternoon, so please refrain
-> from outdoor activities.”
+> English gloss: "A fine-dust advisory has been issued for tomorrow afternoon, so please refrain
+> from outdoor activities."
 > Model output: `먼지1# 주의보1 밖1 하지마1 내일1 오후1`
 
 Below is the final avatar animation completed by my teammate in Unity after switching to a
@@ -127,6 +125,3 @@ compatible rigged model.
 >
   <source src="/media/sign-language/unity-final-animation.mp4" type="video/mp4" />
 </video>
-
-The team implemented the full flow from text to sign-language morphemes, 3D coordinates, and
-avatar motion. My contributions were the translation model and Blender-based error diagnosis.

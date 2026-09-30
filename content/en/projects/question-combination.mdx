@@ -1,7 +1,7 @@
 ---
 title: "Improving Answer-Choice Combination for Korean CSAT English Questions"
 description: "Used constraint optimization to restore the valid question pool from about 40,000 to about 90,000 after an answer-choice reuse bug."
-period: "Feb 2026 – Mar 2026"
+period: "Feb 2026 - Mar 2026"
 sortDate: "2026-02-01"
 tags: ["Professional Work"]
 role: "BookIPs · AI Engineer"
@@ -12,7 +12,7 @@ order: 3
 
 This work was part of the [English Question Generation and Validation System for South Korea's
 College Scholastic Ability Test
-(CSAT)](/en/projects/tacit-knowledge-to-rules/), which generated batches of 20,000–90,000 questions
+(CSAT)](/en/projects/tacit-knowledge-to-rules/), which generated batches of 20,000-90,000 questions
 depending on the type and reused the same generation logic in a real-time service.
 
 The existing system combined pre-generated correct answers and distractors for each passage to
@@ -22,7 +22,7 @@ second question, for example, was supposed to draw a new mix of answer choices b
 the same five from the first question and changed only whether the prompt asked learners to identify
 the correct or incorrect option.
 
-As a result, the valid question pool fell to roughly half its previous size—about 40,000—far below
+As a result, the valid question pool fell to roughly half its previous size, about 40,000, far below
 the target. Cumulative LLM spending for the overall batch-generation process was already in the
 tens of millions of won, so generating the shortfall from scratch would have added both
 cost and another round of review.
@@ -38,8 +38,8 @@ already passed review. Every valid question had to satisfy all of the following 
 
 ## Algorithm selection
 
-The first greedy approach I reviewed precomputed all candidate combinations, causing the search
-space to grow rapidly once the number of choices per passage passed a certain level. For larger inputs,
+The first approach I reviewed was an exhaustive search that tested every possible combination, and
+the search space grew rapidly once the number of choices per passage passed a certain level. For larger inputs,
 randomized greedy became an alternative that could find a valid solution quickly without
 guaranteeing the optimal combination. Separately, I formulated the problem as integer programming
 and found that, at manageable input sizes, it could produce an optimal solution satisfying every
@@ -52,8 +52,4 @@ question-generation pipeline so they could run repeatedly within the existing da
 
 ## Results
 
-Without generating any new answer choices, the system recovered about 90,000 valid questions. This was
-not net growth from 40,000; it restored output to approximately the pre-bug level. The LLM
-remained responsible for answer-choice generation, while the
-constraint-based combination algorithm enforced the combination rules and recovered the usable
-data that had already passed review.
+Without generating any new answer choices, the system recovered about 90,000 valid questions.

@@ -11,27 +11,26 @@ order: 1
 ---
 
 This was a two-week competition to predict apartment sale prices over the following three months
-from historical transaction data. I focused on recovering price-relevant features with extensive
-missing values by combining architectural domain knowledge with external data. On a four-person
+from historical transaction data. I recovered price-relevant features with extensive missing values
+by combining architectural domain knowledge with external data. On a four-person
 team, I handled EDA, feature engineering, and external data collection; model selection and tuning
 were collaborative.
 
-## Using domain knowledge to guide EDA
+## Domain-knowledge-based EDA
 
 Gross floor area, building footprint, parking capacity, floor level, and XY coordinates all had
 substantial missingness, so we initially removed them. I brought them back because they contained
 information needed to explain price. Conversely, I excluded features with little relevance to
 sale price, such as road-name address and title-registration filing date. I also changed the
 definition of a newly built property from the existing 15-year cutoff to the 20-year threshold
-used for aged and substandard buildings. Rather than reducing features indiscriminately, I used
-architectural domain knowledge to decide which values to retain and which to discard.
+used for aged and substandard buildings.
 
 In QGIS, I extracted building footprint, gross floor area, site area, and parcel-centroid
 coordinates for each address and joined them to the original data. For values that external data
 could not fill, I used linear interpolation or Iterative Imputer according to each column's
 characteristics.
 
-## Validating data against official records
+## Data validation against official records
 
 I recomputed floor area ratio and building coverage ratio from the dataset's gross floor area,
 building footprint, and site area, then compared them with the ratios in official records. I also

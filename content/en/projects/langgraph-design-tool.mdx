@@ -22,7 +22,7 @@ generation, the tool traces the node entering each conditional node, groups its 
 branch with `add_conditional_edges`; other connections become `add_edge` calls.
 
 I could have diagrammed the structure in n8n, but the required output was LangGraph code I could paste straight
-into a Python project. Instead of installing and operating a workflow platform, I focused on designing the
-structure comfortably on screen and taking it straight to code. The tool serializes the nodes, edges, entry point, and graph name as JSON in the URL hash, allowing the same
+into a Python project. So I built it to take a structure designed on screen straight to code, without
+installing a workflow platform. The tool serializes the nodes, edges, entry point, and graph name as JSON in the URL hash, allowing the same
 URL to reconstruct and share a design without a server or persistence layer. It is deployed on Netlify so it can
 be used without installation as needed.

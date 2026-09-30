@@ -1,5 +1,5 @@
 ---
-title: "Credit Card Customer Segmentation — Public Competition"
+title: "Credit Card Customer Segmentation"
 description: "Classified credit card customers from 857 features, placing 9th overall (top 4%) as a solo competitor."
 period: "Apr 2025"
 sortDate: "2025-04-22"
@@ -10,8 +10,8 @@ featured: false
 order: 1
 ---
 
-This AI Hub × DACON competition asked participants to classify customers into segments A–E using credit card
-data from July through December 2018. I entered solo with three days remaining and worked on it from April 22–24,
+This AI Hub × DACON competition asked participants to classify customers into segments A-E using credit card
+data from July through December 2018. I entered solo with three days remaining and worked on it from April 22-24,
 2025. The training set contained 2.4 million rows, the test set 600,000, and each had 857 features. Given the
 feature count and short schedule, I started by inspecting the raw data and establishing a focused EDA process.
 
@@ -23,11 +23,11 @@ examined correlations alongside XGBoost feature importance. Balance-change-rate 
 `변동률_잔액_B1M/B3M/B6M` were highly correlated, so I retained only the one-month value for short-term change
 and the 12-month value for long-term change.
 
-Feature cleanup alone did not materially improve the F1 score. Further analysis revealed a severe class imbalance:
-class E had 1,922,052 examples while class B had only 144, and applying class weights produced a clearer gain. I
+The class distribution was severely imbalanced, with 1,922,052 examples in class E and only 144 in class B, and
+applying class weights produced a clearer gain. I
 then ran hyperparameter optimization with Optuna and tracked the experiments with Weights & Biases.
 
-## Scores—and an experiment I rolled back
+## Score progression
 
 The F1 score changed as follows:
 
@@ -38,10 +38,8 @@ The F1 score changed as follows:
 | Class weights | 0.6233150159 |
 | Optuna hyperparameter optimization | 0.6807361123 |
 
-Feature cleanup improved the score by only 0.0006; the largest gain came from Optuna optimization. Because the
-data was divided by month, I also trained a separate model for each month and ensembled them. The single July model scored
-0.6526258004, however, while the ensemble fell to 0.5207443808. I could not diagnose the cause within the short
-competition window, so I stopped pursuing that experiment and returned to the original data.
+The largest gain came from Optuna optimization. I also tried training a separate model for each month and
+ensembling them, but it scored lower and was not used in the final submission.
 
 I finished 9th overall, in the top 4%.
 

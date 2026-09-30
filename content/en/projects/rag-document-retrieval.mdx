@@ -13,8 +13,8 @@ order: 1
 This was a four-day competition to retrieve the documents relevant to either a standalone
 question or a multi-turn conversation and submit the top three results. The metric was mean
 average precision (MAP). In our
-first meeting, we split the work into two approaches—LLM-based retrieval and embedding
-retrieval—then ran them in parallel and shared the findings. On the two-person team, I handled
+first meeting, we split the work into two approaches, LLM-based retrieval and embedding
+retrieval, then ran them in parallel and shared the findings. On the two-person team, I handled
 query and document rewriting experiments and embedding retrieval.
 
 ## Experiment direction
@@ -55,11 +55,4 @@ the largest gain among the text-representation experiments.
 For the final submission, I combined candidates retrieved from the original questions and
 documents, rewritten questions, and rewritten documents. Rather than replace the originals with a
 single transformed representation, I retained the different candidates each representation found.
-
-## Results
-
-The team was originally formed with four members, but two withdrew, leaving the two of us to
-run the actual competition. With only four days to test the LLM and embedding approaches in
-parallel, we did not train and apply a separate reranker. We began with an embedding-model
-comparison, but the decisive improvement came from the rewriting logic that adapted the
-representation of questions and documents to retrieval. We placed second overall.
+We placed second overall.
