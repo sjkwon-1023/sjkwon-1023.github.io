@@ -1,7 +1,7 @@
 ---
 title: "Document Image Classification"
 description: "Classified 17 document types and used OCR only for low-confidence predictions, placing 5th in the competition."
-period: "Oct 29 – Nov 7, 2024"
+period: "Oct 29 - Nov 7, 2024"
 sortDate: "2024-10-29"
 tags: ["Competition"]
 role: "4-person team · EDA, model training, and OCR (Upstage AI Lab competition)"
@@ -12,8 +12,8 @@ order: 1
 
 The task was to classify images of 17 document types, including bank-account documents, passports, medical
 certificates, and vehicle registration certificates. The training set contained 1,570 clean images, while the
-3,140 test images included blur, noise, and other transformations. Many categories—such as medical certificates,
-medical opinion letters, and medical-payment certificates—also had similar layouts. On the four-person team, I
+3,140 test images included blur, noise, and other transformations. Many categories, such as medical certificates,
+medical opinion letters, and medical-payment certificates, also had similar layouts. On the four-person team, I
 was responsible for EDA, model training, and OCR experiments.
 
 ## Experiment direction
@@ -27,7 +27,7 @@ dropped the OCR-only approach and shifted the project to image classification.
 
 I applied the blur and noise observed in the test set to training images and used Mixup, CutMix, and Augraphy. At
 inference time, I applied test-time augmentation (TTA) using shifts, rotations, and flips. The team compared
-ResNet34/50, EfficientNet B3–B7 and V2-XL, ConvNeXt, and ViT-Base, selecting ConvNeXt as the final model because it
+ResNet34/50, EfficientNet B3-B7 and V2-XL, ConvNeXt, and ViT-Base, selecting ConvNeXt as the final model because it
 performed best.
 
 ## OCR ensemble

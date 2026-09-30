@@ -1,7 +1,7 @@
 ---
 title: "문서 이미지 분류"
 description: "17종 문서를 이미지로 분류하고 신뢰도가 낮은 결과만 OCR로 보완해 경진대회 5위를 기록했습니다."
-period: "2024.10.29 – 2024.11.07"
+period: "2024.10.29 - 2024.11.07"
 sortDate: "2024-10-29"
 tags: ["경진대회"]
 role: "4인 · EDA·모델학습·OCR 담당 (Upstage AI Lab 경진대회)"
@@ -25,7 +25,7 @@ Test 이미지의 노이즈가 예상보다 심해 텍스트를 안정적으로 
 ## 데이터 Augmentation
 
 Test에서 확인한 Blur와 Noise를 Train에 적용하고 Mixup, CutMix, Augraphy를 사용했습니다. 추론
-단계에는 Shift, Rotation, Flip TTA를 적용했습니다. 팀에서 ResNet34/50, EfficientNet B3–B7와
+단계에는 Shift, Rotation, Flip TTA를 적용했습니다. 팀에서 ResNet34/50, EfficientNet B3-B7와
 V2_xl, ConvNeXt, ViT-Base를 비교했고, 성능이 가장 높았던 ConvNeXt를 최종 모델로 선택했습니다.
 
 ## OCR 앙상블

@@ -1,7 +1,7 @@
 ---
 title: "Summarizing Patent-Dispute Response Reports"
 description: "Condensed patent-dispute response reports averaging 200 pages into one or two pages within HyperCLOVA X's 8K-token limit."
-period: "Jan – Feb 2025"
+period: "Jan - Feb 2025"
 sortDate: "2025-01-13"
 tags: ["Industry Collaboration"]
 role: "4-person team · LLM summarization module and keyword extraction (industry collaboration)"
@@ -11,16 +11,16 @@ order: 1
 ---
 
 We needed to condense patent-dispute response consulting reports averaging roughly 200 pages into one or two
-pages that a nonspecialist could understand. Document length was only part of the problem: the 20 samples ranged
+pages that a nonspecialist could understand. The 20 samples ranged
 from 20 to more than 600 pages, used different patent-firm templates, and mixed English, Japanese, and
 Chinese.
 
-## Overcoming the context length limit
+## Long-document summarization approach
 
 Under the company's requirements, we could not use a separate GPU instance, and the reports came from a
 Korea Institute of Patent Information (KIPI) support program, so we had to use a Naver API covered by an
 intermediate-level or higher public-sector Cloud Security Assurance Program (CSAP) certification. Open-source models were
-therefore not an option, and we used HyperCLOVA X, which met the requirements at the time.
+not an option, and we used HyperCLOVA X, which met the requirements at the time.
 
 HyperCLOVA X's maximum context was then 8,192 tokens, while the source reports averaged more than 100,000
 characters. Because a report could not fit in one request, I first compared two approaches to long-document
@@ -32,7 +32,7 @@ summarization.
 | Refine | Pass the previous chunk's summary into the next request | The growing summary leaves progressively less context for later chunks |
 
 Refine preserved earlier context more effectively, but left less and less token capacity for the end of the
-document—for longer reports, too little context remained to summarize the later sections. Map Reduce divided long documents reliably, but produced fragmented summaries with inconsistent
+document, so for longer reports too little context remained to summarize the later sections. Map Reduce divided long documents reliably, but produced fragmented summaries with inconsistent
 transitions between chunks. I used Map Reduce to summarize individual chunks, then added a stage that rewrote
 the combined summary for continuity and consistent formatting.
 
@@ -49,6 +49,6 @@ related terms by vector search.
 
 ## Results
 
-I implemented the summaries—including patents at issue, response strategies, and country-specific details—and
+I implemented the summaries, covering patents at issue, response strategies, and country-specific details, and
 the document-retrieval feature. The project concluded after loading the results into the company's database and
 delivering the source code.

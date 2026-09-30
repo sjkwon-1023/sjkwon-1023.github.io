@@ -1,7 +1,7 @@
 ---
 title: "LangGraph Module for Automated Patent Specification Drafting"
-description: "Encoded a patent attorney's drafting criteria as LangGraph business logic and delivered a containerized module with explicit failure and retry paths."
-period: "Feb 2025 – Mar 2025"
+description: "Encoded a patent attorney's drafting criteria as LangGraph business logic, raising quality under the firm's internal patent-attorney evaluation from about 20-30% to 80-90%."
+period: "Feb 2025 - Mar 2025"
 sortDate: "2025-02-18"
 tags: ["Professional Work", "Contract"]
 role: "Sole engineer responsible for the AI module (startup contract)"
@@ -13,11 +13,11 @@ order: 1
 The client was building a service that automatically drafted the description of an invention and
 its embodiments for patent specifications. The existing AI module did not produce text that could
 be delivered directly to users, so the lead patent attorney had to revise it manually. Under the
-firm's internal patent-attorney evaluation criteria, its quality was only about 20–30% of the
+firm's internal patent-attorney evaluation criteria, its quality was only about 20-30% of the
 target. As the sole contractor responsible for the AI module, I handled the LangGraph pipeline
 design, prompts, exception handling, and containerization.
 
-## Process
+## Codifying the drafting criteria
 
 Changing a single model or prompt could not consistently reproduce the attorney's revision
 criteria or the style, word choice, and sentence structure that legal documents require. I worked
@@ -43,13 +43,10 @@ recover than on handling successful responses.
 - Automatically review generated documents and regenerate them when errors are found
 
 Generation tasks ran in parallel. I packaged the completed module as a Docker container so the
-client could integrate it into the existing service environment. Production deployment and
-integration with the other service components were outside my scope.
+client could integrate it into the existing service environment.
 
-## Adopted into the service
+## Results
 
-Quality under the firm's internal patent-attorney evaluation criteria increased from about 20–30%
-to 80–90%. Parallel processing implemented inside the pipeline reduced total processing time by
+Quality under the firm's internal patent-attorney evaluation criteria increased from about 20-30%
+to 80-90%. Parallel processing implemented inside the pipeline reduced total processing time by
 about 20%. The containerized module I delivered was subsequently integrated into the live service.
-For operational stability, the pipeline design included explicit paths and retry conditions for
-interrupted output, invalid input, and failed review.

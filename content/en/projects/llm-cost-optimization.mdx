@@ -30,7 +30,7 @@ applying the API pricing at the time.
 
 Having the lower-cost model run the same free-form evaluation made evaluation stability even worse. So instead
 of deciding from the scores and explanations the validation model produced, I built logic that compared the log
-probabilities of candidate labels. The task needed an accurate pass/fail decision, not a long answer.
+probabilities of candidate labels. The validation step only needed a pass or fail decision.
 
 I compared the lower-cost commercial model's decisions with those of the existing high-end model, examining
 cost, processing time, agreement, and reproducibility across repeated runs. To hold conditions constant, I reran
@@ -44,13 +44,4 @@ the experiment within the Prefect-based generation, validation, and loading pipe
 | Processing time per item | Approx. 30 sec | Approx. 15 sec (−50%) |
 
 In the PoC, run on roughly 100 real sample items, the candidate model's decisions all matched those of the
-existing high-end model. This is not accuracy measured against human-annotated ground truth, but within this
-sample it confirmed the potential to separate validation into a cheaper model and a shorter classification task.
-
-## Confirmed potential and expansion directions
-
-This PoC confirmed that, rather than entrusting every evaluation to a high-end judge's free-form responses,
-separating it into short label classification by a lower-cost model can cut cost and processing time while
-maintaining agreement with the existing decisions. It also let me select the candidate model and classification
-method to adopt, and pin down the validation scope that a production rollout would need to confirm with
-type-stratified samples and expert-annotated ground-truth labels.
+existing high-end model.

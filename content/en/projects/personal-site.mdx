@@ -16,8 +16,7 @@ I built this personal site so project write-ups and technical articles would not
 across different platforms, with the MDX files in the repository as the single source of truth.
 Each file in `content/posts/*.mdx` and `content/projects/*.mdx` keeps its content and
 frontmatter together, and Next.js generates the corresponding list and detail pages at build
-time. The key requirement was being able to revise content without also changing the UI
-code.
+time, so revising content does not require changing the UI code.
 
 ## GitHub Pages
 
@@ -27,12 +26,10 @@ generate static files only.
 
 The same principle guided syntax highlighting. Shiki completes its work at build time, so no
 highlighter ships to the browser. A small inline script chooses the light or dark theme before the
-first render; CSS and a client-side toggle handle subsequent changes. This preserves static
-deployment while reducing theme flashes on initial load.
+first render to reduce theme flashes, and CSS and a client-side toggle handle subsequent changes.
 
 ## CI/CD
 
 A push to the `main` branch triggers GitHub Actions to run lint and `next build`. Only the
 generated `out/` directory is deployed to GitHub Pages, and build artifacts are not committed to
-the repository. I kept the deployment flow simple so that the live site and public source point to
-the same commit.
+the repository. The live site and public source always point to the same commit.

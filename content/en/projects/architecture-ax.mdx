@@ -1,10 +1,10 @@
 ---
 title: "Digital & AI Transformation for Architecture Firm"
 description: "Building collaboration and cloud infrastructure, along with automation tools for architectural workflows, at an architecture firm of roughly 100 people."
-period: "Jun 2026 – Present"
+period: "Jun 2026 - Present"
 sortDate: "2026-06-01"
 tags: ["Professional Work", "In Progress"]
-role: "AA Architects & Planners · Head of AI Lab — first dedicated digital and AI transformation lead and in-house developer"
+role: "AA Architects & Planners · Head of AI Lab, first dedicated digital and AI transformation lead and in-house developer"
 stack: ["Python", "FastAPI", "PostgreSQL", "Docker", "Terraform", "GCP", "MCP", "LLM API"]
 featured: true
 order: 1
@@ -14,17 +14,16 @@ As an architectural designer, I was responsible for completing drawings and mode
 to the same organization as its first dedicated digital and AI transformation lead, I began looking at that
 process from a different angle: which steps are repetitive, and where human judgment must remain.
 
-## Choosing the first problem to solve
+## Schematic design workflow analysis
 
 As the only in-house developer in an organization of roughly 100 people, I handle workflow analysis, development
 priorities, service implementation, cloud infrastructure, and adoption by design teams.
 
 Analysis of internal work logs showed that proposal-stage schematic design consumed the most staff time. Site assessment, site planning,
 modeling, aerial renderings, and presentation materials followed one another, and a single cycle typically
-took two to three weeks. Rather than refining one isolated feature first, I decided to develop this flow module by
-module with the full pipeline in mind.
+took two to three weeks. I decided to develop this flow module by module with the full pipeline in mind.
 
-## Why I did not automate everything at once
+## Module-by-module automation
 
 Many stages of schematic design depend more on review than on generation. Instead of handing over the entire
 process at once, I divided it into replaceable modules: AI produces a draft or first-pass evaluation, and a
@@ -33,21 +32,21 @@ designer makes the final decision.
 For aerial rendering, I consolidated the prompting practices that had varied from employee to employee and used
 an Evaluation agent to cut the time spent on simple repetition. Image generation and initial evaluation by large
 language and vision-language models (LLMs/VLMs) are automated, but users review the results and choose the final
-image. The system stores their selections, regeneration requests, and ratings and feeds them back into
-self-improvement, retaining not only the deliverables but also the data needed to improve the Evaluation agent.
+image. Their selections, regeneration requests, and ratings are stored and fed back into the Evaluation agent's
+self-improvement.
 
 Another bottleneck in the aerial-rendering pipeline was the 3D modeling stage. Once the site plan is complete,
 a model has to be built to match it, but proficiency with 3D tools varied widely among staff and the stage took
 far more time than its difficulty warranted, so I moved forward with modeling automation. I developed a Model
 Context Protocol (MCP)-based modeling agent that takes the site plan as DXF input, performs the work that code
-can handle — floor-count recognition, extraction of position coordinates — and pushes the results into the 3D
+can handle, such as floor-count recognition and extraction of position coordinates, and pushes the results into the 3D
 modeling tool.
 
-## The foundation that had to come before AI
+## Collaboration and cloud foundation
 
 If work conversations and documents do not accumulate as company assets, it becomes difficult to connect future
 workflow systems or knowledge retrieval. The company had no internal messenger and work ran over personal
-messengers, so I judged that turning internal knowledge into data had to come first. I led the adoption of
+messengers, so I started by making internal knowledge persist as data. I led the adoption of
 Microsoft 365, Teams, and Outlook, compared products and contract terms, and secured terms that reduced costs by
 approximately 15% relative to list price. I structured the environment so that materials remain under company
 accounts and designed an internal knowledge-retrieval system to be built alongside the future work-log and
@@ -56,9 +55,7 @@ project-management systems.
 The internal services use FastAPI and Next.js. I manage GCP Cloud Run, Cloud SQL, GCS, and Secret Manager with
 Terraform, and built keyless CI/CD with GitHub Actions and Workload Identity Federation (WIF)/OIDC.
 
-## Current status
+## Progress
 
-This is not yet the stage where I would claim end-to-end automation of schematic design. Even a single module,
-however, already delivers time savings, and the system is designed around the full roadmap so the organization
-can gradually shift to an AI-based work environment. I am connecting modules in the order in which real user
-choices and feedback accumulate.
+Each module is scoped so that applying it alone cuts the time spent on its stage, and I am connecting the
+modules according to the overall roadmap, in the order in which real user choices and feedback accumulate.
