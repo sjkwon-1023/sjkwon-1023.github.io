@@ -1,6 +1,6 @@
 ---
 title: "mast — 코딩 에이전트를 위한 경량 터미널"
-description: "여러 코딩 에이전트의 실행·입력 대기 상태를 한 화면에 모으고, 같은 LAN의 휴대폰에서도 확인하고 입력할 수 있는 Windows·WSL2 터미널입니다."
+description: "여러 코딩 에이전트의 실행·입력 대기 상태를 한 화면에 모으고, 같은 LAN의 휴대폰에서도 확인하고 입력할 수 있는 Windows·macOS 터미널입니다."
 period: "2026.08 – 진행 중"
 sortDate: "2026-08-11"
 tags: ["개인 프로젝트", "개발 도구"]
@@ -15,108 +15,93 @@ macOS에서는 cmux로 여러 코딩 에이전트를 나란히 띄워 작업했�
 흐름을 쓰고 싶었지만 마땅한 도구가 없어, 제가 실제로 쓰는 기능을 중심으로 코딩 에이전트용 터미널을
 만들었습니다.
 
-Windows에서 매일 쓰다 보니 오히려 맥북의 cmux가 아쉽게 느껴졌습니다. 휴대폰 원격 제어, 에이전트 간
-작업 전달, viewer tab처럼 제 워크플로에 맞춰 넣은 기능이 없었고, RAM 사용량이 커서 여러 에이전트를
-띄우면 버벅이는 느낌이 들었습니다. 그래서 macOS 네이티브 빌드를
-추가했고, 지금은 집의 Windows 데스크톱과 업무용 맥북 모두에서 매일 사용하고 있습니다. 현재 v1.0.0을
-릴리스했습니다.
+매일 쓰면서 휴대폰 원격 제어, 에이전트 간 작업 전달, viewer tab처럼 제 워크플로에 맞춘 기능이
+늘어났고, 맥북에서도 같은 환경을 쓰고 싶어 macOS 네이티브 빌드를 추가했습니다. 지금은 집의
+Windows 데스크톱과 업무용 맥북에서 매일 사용하고 있으며, v1.0.0까지 릴리스했습니다.
 
 ## 주요 기능
 
-- **Split pane과 pane별 tab** — 하나의 workspace 안에서 pane을 가로·세로로 나누고, 각 pane에 여러
-  tab을 둡니다. 새 pane과 tab은 현재 shell의 작업 디렉터리에서 열립니다.
 - **에이전트 상태와 알림** — sidebar에 workspace별로 에이전트의 실행 중·입력 대기·완료 상태와 마지막
-  메시지를 표시하고, 입력을 기다리기 시작한 tab은 badge와 Windows 알림으로 알려 줍니다.
-- **Viewer tab** — 폴더 탐색기, text·Markdown viewer와 편집, working·staged 범위를 나눠 diff를
-  보여 주는 Git 변경 viewer, 개발 중인 웹 페이지를 확인하는 내장 browser tab을 제공합니다.
+  메시지를 표시하고, 입력을 기다리기 시작한 tab은 badge와 알림으로 알려 줍니다.
 - **에이전트 간 협업** — 에이전트가 터미널 안에서 `mast ls`로 같은 workspace의 tab을 찾고
-  `mast send`로 다른 pane에 작업을 넘깁니다. `mast browser`로는 browser tab의 요소와 스크린샷을
-  확인하고 클릭·입력합니다.
-- **휴대폰 원격 제어** — QR로 연결한 휴대폰에서 terminal 출력을 읽고, 전체 화면 TUI를 스크롤하고,
-  에이전트나 Bash shell에 입력을 보냅니다.
-- **세션 복원** — 재시작 후 workspace·split·tab 구조와 tab별 작업 디렉터리를 복원하고, 에이전트가
-  실행 중이던 tab에서는 `Up` 키로 Claude Code·Codex의 resume 명령을 불러옵니다.
-- **Windows와 macOS** — Windows 11(x64·ARM64)과 WSL2를 기본 환경으로 하고, 같은 코드베이스로
-  Apple Silicon macOS 네이티브 빌드를 제공합니다.
+  `mast send`로 다른 pane에 작업을 넘깁니다. `mast browser`로는 browser tab의 화면을 확인하고
+  클릭·입력합니다.
+- **휴대폰 원격 제어** — QR로 연결한 휴대폰에서 터미널 출력을 읽고, 에이전트에 입력을 보냅니다.
+- **Viewer tab** — 폴더 탐색기, Markdown viewer·편집기, Git 변경 viewer, 개발 중인 웹 페이지를
+  확인하는 내장 browser tab을 제공합니다.
+- **세션 복원** — 재시작 후 workspace·split·tab 구조와 작업 디렉터리를 복원하고, Claude Code·Codex의
+  이전 대화를 resume 명령으로 이어갑니다.
 
-![mast 화면 — 왼쪽 sidebar의 workspace별 상태, Claude Code·Codex·폴더 탐색기로 나뉜 pane, 오른쪽에 같은 terminal을 보고 입력하는 휴대폰 화면](/media/mast/desktop-and-phone.png)
+![mast 화면 — 왼쪽 sidebar의 workspace별 상태, Claude Code·Codex·폴더 탐색기로 나뉜 pane, 오른쪽에 같은 터미널을 보고 입력하는 휴대폰 화면](/media/mast/desktop-and-phone.png)
 
-## 에이전트 상태를 tab 단위로 추적하기
+## tab 단위 에이전트 상태 추적
 
-Claude Code, Codex, OpenCode, Antigravity CLI의 hook이 terminal 출력에 OSC 777의
-`mast:running`·`mast:needsInput`·`mast:idle` token을 내보냅니다. Rust의 OSC scanner는 이를 일반
-출력과 분리해 해당 tab의 상태로 반영합니다. OSC 9 같은 일반 알림은 unread와 message만 갱신해
-다른 프로그램이 에이전트 상태를 덮어쓰지 않게 했습니다. 별도 daemon, IPC server나 named pipe 없이
-이미 존재하는 PTY stream을 상태 전달 경로로 사용합니다.
+Claude Code, Codex, OpenCode, Antigravity CLI의 hook이 터미널 출력에 OSC 777 token
+(`mast:running`·`mast:needsInput`·`mast:idle`)을 내보내면, Rust의 OSC scanner가 이를 일반 출력에서
+분리해 해당 tab의 상태로 반영합니다. 이미 있는 PTY stream을 상태 전달 경로로 사용해 별도 daemon이나
+IPC server가 필요 없습니다. OSC 9 같은 일반 알림은 unread 표시와 메시지만 갱신하므로 다른
+프로그램이 에이전트 상태를 덮어쓰지 못합니다.
 
-상태는 tab마다 저장하고, sidebar는 workspace 안에서 가장 급한 tab의 상태를 보여 줍니다. 한
-workspace에서 여러 에이전트를 돌려도 한 tab의 완료가 다른 tab의 실행 중 상태를 덮어쓰지 않고,
-어느 tab이 입력을 기다리는지 바로 알 수 있습니다. 상태는 화면 내용이나 process 이름으로 추측하지
-않고 각 에이전트의 hook 신호로만 판단하며, 앱을 처음 실행할 때 WSL 안에 hook을 자동으로
-설치합니다.
+상태는 tab마다 저장하고, sidebar는 workspace에서 가장 급한 tab의 상태를 보여 줍니다. 한
+workspace에서 여러 에이전트를 돌려도 입력을 기다리는 tab을 바로 찾을 수 있습니다. 상태는 화면
+내용이나 process 이름으로 추측하지 않고 각 에이전트의 hook 신호만 기준으로 삼았으며, hook은 앱을
+처음 실행할 때 WSL 안에 자동으로 설치합니다. 터미널 출력은 byte stream 그대로 두고 UI에는 상태
+변경처럼 빈도가 낮은 event만 보내, 출력 경로에 부담을 더하지 않았습니다.
 
-UI에는 실행 중·입력 대기·완료 상태만 전달하고, terminal의 원문 output은 JSON으로 바꾸지 않습니다.
-출력의 hot path는 byte stream으로 유지하고 상태 변경처럼 빈도가 낮은 event만 UI 계층으로
-보냅니다.
+## 휴대폰 연결: 간단한 pairing과 보안
 
-## 휴대폰 연결을 LAN 안에서 안전하게 열기
-
-휴대폰 연결은 두 가지 방식을 제공합니다. Local HTTP는 설정으로 켜는 방식으로, 신뢰할 수 있는 내부
-네트워크에서 사용합니다. Secure Remote는 GitHub Pages의 HTTPS 페이지가 PC에 WebTransport로 직접
-연결하는 방식입니다. PC는 pairing마다 자체 서명 인증서를 발급하고, 휴대폰은 QR에 담긴 인증서
-SHA-256 fingerprint를 pinning해 그 인증서만 받아들입니다. listener는 QR을 보여 주는 동안에만 열리고,
-한 번에 휴대폰 하나만 연결되며, 인증서 유효 기간은 최대 14일입니다.
-
-두 방식 모두 cloud relay 없이 PC의 LAN 주소로 직접 연결합니다. pairing 창에서 Windows 방화벽
-규칙을 확인하고, 필요하면 UAC 승인을 거쳐 규칙을 추가합니다. 휴대폰 화면은 headless xterm으로
+휴대폰에는 앱을 설치하지 않습니다. 데스크톱에 뜬 QR을 스캔하면 GitHub Pages에 올린 HTTPS 페이지가
+열리고, 이 페이지가 PC에 WebTransport로 직접 연결합니다. cloud relay 없이 같은 LAN 안에서 연결되며,
+한 번 인증한 뒤에는 새로고침하거나 화면을 잠갔다 돌아와도 QR을 다시 찍지 않고 재연결됩니다.
+Windows 방화벽 규칙이 없으면 pairing 창에서 바로 추가할 수 있고, 휴대폰 화면은 headless xterm으로
 렌더링해 데스크톱과 같은 내용을 보여 줍니다.
 
-## WSL2를 기준 환경으로 정하기
+보안의 핵심은 공개 HTTPS 페이지가 PC의 자체 서명 인증서를 어떻게 신뢰하게 할지였습니다. PC는
+pairing마다 인증서를 새로 발급하고, QR의 URL fragment에 인증서의 SHA-256 hash와 인증 token을
+담습니다. fragment는 웹 서버로 전송되지 않아 GitHub Pages에는 남지 않고, 페이지는 WebTransport의
+`serverCertificateHashes`로 그 인증서 하나만 받아들입니다. 이 방식의 규격에 맞춰 인증서 유효 기간은
+최대 14일이며, 인증서·개인키·token은 PC 메모리에만 두어 앱을 종료하면 폐기됩니다.
 
-Windows에서 terminal은 항상 `ConPTY → wsl.exe → login shell`로 실행합니다. 코딩 에이전트와 개발
+listener는 사용자가 pairing을 시작한 뒤에만 열고, 동시 연결은 하나로 제한합니다. 인증 전 연결은
+개수와 대기 시간을 제한하고, 인증 실패가 반복되는 IP는 일정 시간 차단합니다. 공개 페이지 번들은
+CI에서 외부 자원 참조, 평문 HTTP, 허용하지 않은 저장 API가 없는지 검사합니다.
+
+## WSL2를 기준 환경으로
+
+Windows에서 터미널은 항상 `ConPTY → wsl.exe → login shell`로 실행합니다. 코딩 에이전트와 개발
 도구를 WSL2 안에서 사용하는 작업 환경에 맞춰 범위를 정하고, split, tab, workspace 전환과 에이전트
-상태 같은 핵심 기능에 집중했습니다.
+상태 같은 핵심 기능에 집중했습니다. 앱은 시작할 때 WSL 설치와 배포판 상태를 진단해, 준비되지 않은
+경우 원인과 해결 방법을 안내합니다.
 
-앱은 시작할 때 WSL 상태를 한 번 진단해 설치 여부, 배포판 유무, shell 시작 실패 같은 원인을
-구분합니다. 준비되지 않은 경우 설치 명령, 공식 안내, 재검사 버튼을 보여 주고, 정상적인 배포판의
-tab은 영향 없이 실행됩니다.
+## UI와 터미널 수명 분리
 
-전역 단축키는 `Ctrl+Shift`와 `Alt+Shift` 조합을 사용해 shell의 기본 `Ctrl` 입력을 그대로
-보냅니다. 선택 영역이 있을 때만 `Ctrl+C`를 복사로 처리하고, 선택이 없으면 SIGINT로 전달해 터미널
-관례를 유지했습니다.
-
-## UI와 terminal 수명을 분리하기
-
-terminal session, flow control, OSC parsing, replay buffer와 layout 상태는 UI framework에 의존하지
+터미널 세션, flow control, OSC parsing, replay buffer와 layout 상태는 UI framework에 의존하지
 않는 순수 Rust core가 소유합니다. Tauri v2는 host와 WebView 사이의 얇은 연결 계층이고,
 vanilla TypeScript와 xterm.js가 화면을 렌더링합니다.
 
-이 경계 덕분에 메모리 회수를 위해 WebView를 reload해도 PTY session은 Rust에 남아 있고, 새 UI가
+이 경계 덕분에 메모리 회수를 위해 WebView를 reload해도 PTY 세션은 Rust에 남아 있고, 새 UI가
 현재 상태와 scrollback을 다시 받아 붙습니다. 앱을 다시 열 때는 저장한 layout과 작업 디렉터리에서
 shell을 새로 실행하고, 에이전트는 각자의 resume 명령으로 이전 대화를 이어갑니다.
 
-같은 구조를 macOS 지원에도 활용했습니다. workspace·pane·tab 모델과 terminal·replay·OSC·에이전트
+같은 구조를 macOS 지원에도 활용했습니다. workspace·pane·tab 모델과 터미널·replay·OSC·에이전트
 상태 pipeline을 공유하고, 플랫폼별 부분만 분리해 Apple Silicon macOS에서 zsh·bash를 직접 실행하는
 네이티브 빌드를 만들었습니다.
 
-## 메모리 예산 안에서 기능 늘리기
+## 메모리 예산
 
-메모리 목표는 100MB, 허용 상한은 150MB로 정했고, x64 Windows 11 데스크톱에서 WebView2를 포함한
-전체 process tree를 약 129MB로 측정했습니다. 기능을 늘릴 때는 사용하지 않는 기능이 비용을 만들지
-않도록 설계했습니다.
+메모리 상한을 150MB로 정했고, x64 Windows 11 데스크톱에서 WebView2를 포함한 전체 process tree를
+약 129MB로 측정했습니다. 기능을 늘리면서도 쓰지 않는 기능은 비용을 만들지 않도록 설계했습니다.
 
 - viewer 코드와 Markdown parser는 처음 열 때 불러옵니다.
 - 큰 파일은 512KiB 단위 window로 읽어 viewer의 메모리 사용량을 일정하게 유지합니다.
 - browser tab은 처음 보여 줄 때 WebView를 만들고, 설정으로 끄면 관련 자원을 만들지 않습니다.
-- 자동 UI reset을 모두 끄면 감시 thread를 만들지 않습니다.
 
 ## 테스트와 배포
 
 Rust core의 unit·integration test와 TypeScript UI test를 두고, CI에서 x64·ARM64 Windows target의
-check·clippy, frontend build·test, Secure Remote 공개 번들 검사를 실행합니다. ConPTY session을
+check·clippy, frontend build·test, 휴대폰 연결 페이지 번들 검사를 실행합니다. ConPTY 세션을
 500번 생성·종료하는 soak test로 handle과 thread 수가 일정하게 유지되는 것을 확인했습니다.
 macOS 빌드는 실제 shell을 사용하는 PTY 수명 테스트와 CLI·설정 병합 테스트로 검증합니다.
 
 release tag를 만들면 Windows runner가 x64·ARM64 portable executable을 빌드해
-[GitHub Releases](https://github.com/sjkwon-1023/mast/releases)에 첨부합니다. 앱은 실행할 때 새
-릴리스를 확인해 sidebar에 알려 줍니다.
+[GitHub Releases](https://github.com/sjkwon-1023/mast/releases)에 첨부합니다.
