@@ -1,5 +1,5 @@
 ---
-title: "mast — A Lightweight Terminal for Coding Agents"
+title: "mast, a Lightweight Terminal for Coding Agents"
 description: "A Windows and macOS terminal that gathers the running and waiting states of several coding agents on one screen, and lets a phone on the same LAN read and answer them."
 period: "Aug 2026 – Present"
 sortDate: "2026-08-11"
@@ -15,107 +15,105 @@ On macOS, I worked with several coding agents side by side in cmux. I wanted the
 my Windows desktop but could not find a suitable tool, so I built a terminal for coding agents
 around the features I actually use.
 
-As I used it daily, features shaped around my workflow—phone remote control, agent-to-agent
-handoff, and viewer tabs—kept growing, and I wanted the same environment on my MacBook, so I added
-a native macOS build. I now use mast every day on both my Windows desktop at home and my work
-MacBook, and it has reached v1.0.0.
+As I used it daily, features shaped around my workflow, such as phone remote control,
+agent-to-agent handoff, and viewer tabs, kept growing. I wanted the same environment on my
+MacBook, so I added a native macOS build. I now use mast every day on both my Windows desktop at
+home and my work MacBook, and it has reached v1.0.0.
 
 ## Key features
 
-- **Agent status and notifications** — The sidebar shows, for each workspace, whether its agents
-  are running, waiting for input, or finished, together with their latest message. A tab that
-  starts waiting gets a badge and a notification.
-- **Agent-to-agent collaboration** — Inside a terminal, an agent uses `mast ls` to find the tabs in
-  the same workspace and `mast send` to hand work to another pane. With `mast browser`, it reads
-  the browser tab's screen and clicks and types there.
-- **Phone remote control** — A phone paired by QR code reads terminal output and sends input to
-  an agent.
-- **Viewer tabs** — A file explorer, a Markdown viewer and editor, a Git changes viewer, and a
-  built-in browser tab for checking the web page under development.
-- **Session restoration** — After a restart, the workspace, split, and tab structure and working
-  directories are restored, and Claude Code or Codex conversations continue through their resume
-  commands.
+- The sidebar shows, for each workspace, whether its agents are running, waiting for input, or
+  finished, along with their latest message. A tab that starts waiting gets a badge and a
+  notification.
+- Inside a terminal, an agent uses `mast ls` to find the tabs in the same workspace and
+  `mast send` to hand work to another pane. With `mast browser`, it can also read the browser
+  tab's screen and click or type there.
+- A phone paired by QR code reads terminal output and sends input to an agent.
+- A file explorer, a Markdown viewer and editor, a Git changes viewer, and a built-in browser open
+  as tabs.
+- After a restart, the workspace, split, and tab structure and working directories are restored,
+  and Claude Code and Codex continue earlier conversations through their resume commands.
 
-![The mast interface — per-workspace status in the left sidebar, panes holding Claude Code, Codex, and the file explorer, and a phone on the right reading and typing into the same terminal](/media/mast/desktop-and-phone.png)
+![Per-workspace status in the left sidebar, panes holding Claude Code, Codex, and the file explorer, and a phone showing the same terminal](/media/mast/desktop-and-phone.png)
 
-## Tracking agent status per tab
+## Per-tab agent status tracking
 
 Hooks for Claude Code, Codex, OpenCode, and Antigravity CLI emit OSC 777 tokens (`mast:running`,
 `mast:needsInput`, and `mast:idle`) into terminal output, and the Rust OSC scanner separates them
 from ordinary output and applies the status to the corresponding tab. Because the existing PTY
-stream carries the status, no separate daemon or IPC server is needed. Standard notifications
-such as OSC 9 update only the unread state and message, so other programs cannot overwrite
-agent status.
+stream carries the status, there is no separate daemon or IPC server. Standard notifications such
+as OSC 9 change only the unread state and message, so other programs cannot overwrite agent
+status.
 
-Status is stored per tab, and the sidebar shows the most urgent tab in each workspace. Even with
-several agents in one workspace, the tab waiting for input is easy to spot. Status is based only
-on each agent's hook signals rather than guessed from screen contents or process names, and the
-app installs the hooks inside WSL on first launch. Terminal output stays a byte stream, and only
-low-frequency events such as state changes go to the UI, so the output path carries no extra load.
+Status is stored per tab, and the sidebar shows the most urgent tab in each workspace. With
+several agents in one workspace, the tab waiting for input is easy to find. Status is determined
+only by each agent's hook signals, not guessed from screen contents or process names, and the app
+installs the hooks inside WSL on first launch. Terminal output stays a byte stream, and only
+infrequent events such as state changes go to the UI.
 
-## Phone connection: simple pairing, built for security
+## Phone remote connection
 
 The phone needs no app. Scanning the QR code on the desktop opens an HTTPS page hosted on GitHub
 Pages, and that page connects directly to the PC over WebTransport. The connection stays within
 the LAN with no cloud relay, and once authenticated, the phone reconnects after a refresh or a
 screen lock without scanning again. If the Windows Firewall rule is missing, the pairing dialog
-can add it on the spot, and the phone renders the screen with a headless xterm, showing the same
+can add it on the spot. The phone renders the screen with a headless xterm, showing the same
 content as the desktop.
 
-The central security question was how a public HTTPS page could trust the PC's self-signed
-certificate. The PC issues a new certificate for each pairing and places the certificate's SHA-256
+The PC issues a new self-signed certificate for each pairing and places the certificate's SHA-256
 hash and an authentication token in the QR code's URL fragment. Browsers never send the fragment
-to the web server, so it never reaches GitHub Pages, and the page uses WebTransport's
-`serverCertificateHashes` to accept that one certificate alone. As this mechanism requires, the
-certificate is valid for at most 14 days, and the certificate, private key, and token live only in
-the PC's memory and are discarded when the app exits.
+to the web server, so it never reaches GitHub Pages. The page uses WebTransport's
+`serverCertificateHashes` to accept that one certificate alone, which lets a public HTTPS page
+connect to the PC's self-signed certificate. The mechanism limits certificate validity to at most
+14 days. The certificate, private key, and token live only in the PC's memory and are discarded
+when the app exits.
 
 The listener opens only after the user starts pairing, and only one connection is active at a
-time. Unauthenticated connections are limited in number and waiting time, and an IP that keeps
-failing authentication is blocked for a while. CI checks the public page bundle for external
-resource references, plaintext HTTP, and disallowed storage APIs.
+time. Unauthenticated connections are limited in number and waiting time, and an IP that
+repeatedly fails authentication is blocked for a while. CI checks the public page bundle for
+external resource references, plaintext HTTP, and disallowed storage APIs.
 
-## WSL2 as the reference environment
+## UI and terminal lifetime separation
 
-On Windows, a terminal always launches as `ConPTY → wsl.exe → login shell`. I scoped the product to
-my working environment, where coding agents and development tools run inside WSL2, and focused on
-the core features: splits, tabs, workspace switching, and agent status. At startup, the app
-diagnoses WSL installation and distribution status and, when WSL is not ready, explains the cause
-and how to fix it.
+A Rust core independent of any UI framework manages terminal sessions, flow control, OSC parsing,
+the replay buffer, and layout state. Tauri v2 is a thin layer between the host and the WebView,
+and vanilla TypeScript and xterm.js render the interface.
 
-## Separating the UI from the terminal lifetime
+A WebView reload used to reclaim memory leaves the PTY session in Rust, and the new UI reattaches
+to the current state and scrollback. When the app reopens, it launches fresh shells in the saved
+layout and working directories, and each agent continues its earlier conversation through its own
+resume command.
 
-A UI-framework-independent Rust core owns terminal sessions, flow control, OSC parsing, the replay
-buffer, and layout state. Tauri v2 is a thin bridge between the host and the WebView, while vanilla
-TypeScript and xterm.js render the interface.
+## Windows and macOS support
 
-Because of this boundary, a WebView reload used to reclaim memory leaves the PTY session in Rust,
-and the new UI reattaches to the current state and scrollback. When the app reopens, it launches
-fresh shells in the saved layout and working directories, and each agent continues its earlier
-conversation through its own resume command.
+On Windows, a terminal always launches as `ConPTY → wsl.exe → login shell`. My coding agents and
+development tools run inside WSL2, so on Windows mast supports WSL2 only. At startup, the app
+checks WSL installation and distribution status and, when WSL is not ready, explains the cause and
+how to fix it.
 
-The same structure made macOS support possible. Sharing the workspace, pane, and tab model and the
-terminal, replay, OSC, and agent-status pipelines, and separating only the platform-specific parts,
-I built a native Apple Silicon macOS build that launches zsh or bash directly.
+The macOS build shares the workspace, pane, and tab model and the terminal replay, OSC handling,
+and agent-status pipelines with the Windows build. Only the platform-specific parts are separate,
+and on Apple Silicon macOS it launches zsh or bash directly.
 
 ## Memory budget
 
 I set a memory ceiling of 150 MB, and on an x64 Windows 11 desktop I measured the whole process
-tree including WebView2 at about 129 MB. As features grew, I designed them so that unused features
-cost nothing.
+tree including WebView2 at about 129 MB. When adding features, I kept unused features from taking
+up memory.
 
 - Viewer code and the Markdown parser load when first opened.
-- Large files are read in 512 KiB windows, keeping viewer memory use constant.
-- A browser tab creates its WebView when first shown, and turning the feature off in settings
-  creates none of its resources.
+- Large files are read in 512 KiB chunks, so viewer memory use stays constant regardless of file
+  size.
+- A browser tab creates its WebView when first shown, and none at all when the feature is turned
+  off in settings.
 
 ## Testing and distribution
 
-The project includes unit and integration tests for the Rust core and UI tests for TypeScript. CI
-runs `check` and Clippy for the x64 and ARM64 Windows targets, frontend builds and tests, and an
-audit of the phone connection page bundle. A soak test that creates and destroys a ConPTY session
-500 times confirmed that handle and thread counts stay constant. The macOS build is verified with
-PTY lifetime tests against real shells and tests for the CLI and settings merging.
+The Rust core has unit and integration tests, and the TypeScript UI has UI tests. CI runs `check`
+and Clippy for the x64 and ARM64 Windows targets, frontend builds and tests, and an audit of the
+phone connection page bundle. A soak test that creates and destroys a ConPTY session 500 times
+confirmed that handle and thread counts do not grow. The macOS build is verified with PTY lifetime
+tests against real shells and tests for the CLI and settings merging.
 
-On a release tag, Windows runners build x64 and ARM64 portable executables and attach them to
+On a release tag, Windows runners build x64 and ARM64 portable executables and upload them to
 [GitHub Releases](https://github.com/sjkwon-1023/mast/releases).
